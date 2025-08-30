@@ -1,6 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CustomBreadcrumb } from '../../shared/breadcrumb/custom-breadcrumb';
-import { PageHeader } from '../../shared/page-header/page-header';
 import { DividerModule } from 'primeng/divider';
 import { CommonModule } from '@angular/common';
 import { MessageService } from 'primeng/api';
@@ -29,6 +27,7 @@ import { AuthService } from '../../pages/login/service/auth.service';
 })
 export class EntryUserComponent implements OnInit {  
 
+  @Input() userName: string = '';
   editingEntryId: string | null = null;
   entries: Entry[] = [];
   entryToSave: EntryRequest = new EntryRequest();
@@ -57,6 +56,8 @@ export class EntryUserComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('username: ', this.userName);
+    
     this.loadEntries();
   }
 

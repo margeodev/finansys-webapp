@@ -11,4 +11,10 @@
                  style-class="p-button-secondary"></app-page-header>
                  
 
-<app-entry-user></app-entry-user>
+<div class="flex gap-4">
+  <app-entry-user [userName]="user"></app-entry-user>
+  
+  <p-divider layout="vertical"/>
+  
+  <app-entry-user [userName]="user"></app-entry-user>
+</div>
