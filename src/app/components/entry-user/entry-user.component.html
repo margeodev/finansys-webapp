@@ -1,0 +1,101 @@
+<div class="mb-3">
+  <p-card>
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <span class="font-bold block">User:
+          <!-- <span class="font-medium">{{ user }}</span> -->
+          <span class="font-medium">User</span>
+        </span>
+
+        <span class="font-bold block">Subtotal:
+          <!-- <span class="font-medium">{{ total | currency: 'BRL': 'symbol':'1.2-2':'pt-BR'}}</span> -->
+          <span class="font-medium">Total</span>
+        </span>
+      </div>
+
+      <div class="mt-3">
+        <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar" [disabled]="deveExibirBotaoAdicionar"/>
+          <p-dialog header="Teste" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+              <div class="flex items-center gap-4 mb-4">
+                  <label for="description" class="font-semibold w-24">Descrição</label>
+                  <div class="flex flex-col flex-auto">
+                    <input pInputText id="description"  [formControl]="form.controls['description']" class="flex-auto" autocomplete="off" />
+                    <div *ngIf="form.controls['description'].invalid && form.controls['description'].touched" class="text-red-500 text-sm">
+                      A descrição é obrigatória
+                    </div>
+                  </div>
+              </div>
+              <div class="flex items-center gap-4 mb-4">
+                  <label for="amount" class="font-semibold w-24">Valor</label>
+                  <div class="flex flex-col flex-auto">
+                    <input pInputText [formControl]="form.controls['amount']" inputId="amount" class="flex-auto" autocomplete="off" />
+                    <div *ngIf="form.controls['amount'].invalid && form.controls['amount'].touched" class="text-red-500 text-sm">
+                      O valor é obrigatório
+                    </div>
+                  </div>
+              </div>
+              <div class="flex justify-end gap-2">
+                  <p-button label="Cancel" severity="secondary" (click)="visible = false" />
+                  <p-button label="Save" (click)="saveEntry()" />
+              </div>
+          </p-dialog>
+      </div>
+  </p-card>
+
+  <div>
+    <p-table [value]="entries" 
+         styleClass="p-datatable-gridlines my-custom-table"
+         showGridlines
+         stripedRows
+         [size]="'small'"
+         [paginator]="true"
+         [rows]="15">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="col-descricao">Descrição</th>
+          <th class="col-category">Categoria</th>
+          <th class="col-data">Data</th>
+          <th class="col-valor">Valor</th>
+          <th class="col-acoes">Ações</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-entry>
+        <tr>
+          <!-- Descição -->
+          <td>{{ entry.description }}</td>
+
+          <!-- Categoria -->
+          <td><p-chip class="!py-0 !pl-0 !pr-4" styleClass="my-custom-chip">
+                <span class="bg-primary text-primary-contrast ml-3 flex items-center justify-center">
+                  <!-- <span class="material-icons">{{ getCategoryIcon(entry?.category?.id) }}</span> -->
+                  <!-- <fa-icon [icon]="faCoffee" /> -->
+                  <!-- <fa-icon [icon]="getCategoryIcon(entry?.category?.id)" /> -->
+                   <!-- <i class="fa-regular fa-lightbulb-dollar"></i> -->
+                   <!-- <i class="fa-regular fa-lightbulb-dollar"></i> -->
+                   <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
+
+                </span>
+                <span class="ml-2 font-medium">{{ entry?.category?.description }}</span>
+              </p-chip>
+          </td>
+
+          <!-- Data -->
+          <td>{{ entry.date | date: 'dd/MM/yyyy' }}</td>
+
+          <!-- Valor -->
+          <td>{{ entry.amount | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</td>
+
+          <!-- Ações -->
+            <td><div>
+              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-warning p-button-outlined p-button-sm mr-2" (click)="showEditDialog(entry)"></p-button>
+                    <!-- <p-button (click)="confirm(entry)" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger p-button-outlined p-button-sm"></p-button> -->
+                    
+                </div>
+            </td>
+        </tr>
+      </ng-template>
+        
+    </p-table>
+  </div>
+</div>
