@@ -28,28 +28,10 @@ export class EntryUserComponent implements OnInit {
 
   @Input() userName: string = '';
   isEditing: boolean = false;
-  editingEntryId: string | null = null;
   entries: Entry[] = [];
-  entryToSave: EntryRequest = new EntryRequest();
   entryToEdit: EntryRequest = new EntryRequest();
   visible: boolean = false;
   deveExibirBotaoAdicionar: boolean = false;
-
-  categorias: { [key: string]: string[] } = {
-    "1": ["aluguel", "alugueis", "condominio", "condominios", "iptu", "casa", "casas", "moradia", "moradias"],
-    "2": ["mercado", "mercados", "supermercado", "supermercados", "compra", "compras"],
-    "3": ["energia", "conta energia", "conta de energia", "agua", "conta agua", "conta de agua", "luz", "telefone", "telefones", "internet", "internets", "conta de luz"],
-    "4": ["gasolina", "uber", "onibus", "transporte", "transportes", "combustivel", "taxi"],
-    "5": ["cinema", "festa", "festas", "lazer", "show", "viagem", "hotel", "pousada", "parque"],
-    "6": ["medico", "hospital", "saude", "exame", "exames", "consulta", "consultas"],
-    "7": ["bar", "restaurante", "restaurante chines", "almoço", "janta", "comida chinesa", "habbibs", "habibs", "habibes", "habibis", "macdonalds", "mcdonalds", "ifood", "lanche", "lanches", "pizza", "pizzas", "pizzaria", "jantar", "almoco", "almocos", "cafe", "cafes", "bebida", "bebidas", "churrasco", "churrascos", "agua de coco", "aguas de coco"],
-    "8": ["manutencao", "reforma", "reformas", "obra"],
-    "9": ["padaria", "padarias", "pao", "paes", "bolo", "bolos"],
-    "10": ["farmacia", "farmacias", "remedio", "remedios", "medicamento", "medicamentos"],
-    "11": ["outros", "diverso", "diversos"],
-    "12": ["pet", "pets", "cachorro", "cachorros", "gato", "gatos", "racao", "racoes", "areia gato", "areia para gato", "areia do gato", "banho e tosa", "banho", "tosa"],
-    "13": ["carro", "carros", "oficina", "oficinas", "mecanico", "mecanico", "pneu", "pneus", "manutençao carro", "manutencao carro", "manutençao do carro", "manutençao carros"]
-  };
 
   constructor(
     private service: EntryService,
@@ -57,8 +39,9 @@ export class EntryUserComponent implements OnInit {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {    
+  ngOnInit(): void {        
     this.loadEntries();
+    this.verifyUserPermission();
   }
   
   showCreateDialog() {
@@ -87,23 +70,19 @@ export class EntryUserComponent implements OnInit {
     this.visible = false;
   }
 
-
-  private resetAndClose(): void {
-    // this.form.reset();
-    this.visible = false;
-    this.editingEntryId = null;
+  verifyUserPermission() {
+    const user = this.authService.getLoggedUser();
+    if(this.userName === user?.username) {     
+      this.deveExibirBotaoAdicionar = true;
+    } else {
+      this.deveExibirBotaoAdicionar = false;
+    }
   }
 
 // ========================== INICIO TABELA ==========================
 
   private loadEntries(): void {
-    const user = this.authService.getLoggedUser();
-    if (!user) {
-      this.showMessage(NotificationType.ERROR, '', 'User ID not found. Cannot load entries.')
-      return;
-    }
-
-    this.service.getByUserAndMonth(user.username).subscribe({
+    this.service.getByUserAndMonth(this.userName).subscribe({
       next: (data) => {
         this.entries = data;
       },

@@ -13,7 +13,7 @@
       </div>
 
       <div class="mt-3">
-        <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar" [disabled]="deveExibirBotaoAdicionar"/>
+        <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar" [disabled]="!deveExibirBotaoAdicionar"/>
           <p-dialog header="Teste" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
               <app-entry-form (closeDialog)="onCloseDialog()" [entryToEdit]="entryToEdit" [isEditing]="isEditing"></app-entry-form>
           </p-dialog>
@@ -41,31 +41,20 @@
 
       <ng-template pTemplate="body" let-entry>
         <tr>
-          <!-- Descição -->
           <td>{{ entry.description }}</td>
 
-          <!-- Categoria -->
           <td><p-chip class="!py-0 !pl-0 !pr-4" styleClass="my-custom-chip">
                 <span class="bg-primary text-primary-contrast ml-3 flex items-center justify-center">
-                  <!-- <span class="material-icons">{{ getCategoryIcon(entry?.category?.id) }}</span> -->
-                  <!-- <fa-icon [icon]="faCoffee" /> -->
-                  <!-- <fa-icon [icon]="getCategoryIcon(entry?.category?.id)" /> -->
-                   <!-- <i class="fa-regular fa-lightbulb-dollar"></i> -->
-                   <!-- <i class="fa-regular fa-lightbulb-dollar"></i> -->
                    <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
-
                 </span>
                 <span class="ml-2 font-medium">{{ entry?.category?.description }}</span>
               </p-chip>
           </td>
 
-          <!-- Data -->
           <td>{{ entry.date | date: 'dd/MM/yyyy' }}</td>
 
-          <!-- Valor -->
           <td>{{ entry.amount | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</td>
 
-          <!-- Ações -->
             <td><div>
               <p-button icon="pi pi-pencil" 
                         styleClass="p-button-rounded p-button-warning p-button-outlined p-button-sm mr-2" 

@@ -72,28 +72,41 @@ export class EntryFormComponent implements OnInit {
   }
 
   private getCategoriaIdByTerm(term: string): string {
-    const normalizedTerm = term
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, ""); // Remove acentos
+    const normalize = (str: string) =>
+      str
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    const tokens = normalize(term).split(/\s+/); // quebra em palavras
+
+    let bestCategoria = "11"; // default: outros
+    let bestScore = 0;
 
     for (const [id, termos] of Object.entries(this.categorias)) {
-      const normalizedTermos = termos.map(t =>
-        t
-          .trim()
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-      );
+      let score = 0;
 
-      if (normalizedTermos.includes(normalizedTerm)) {
-        return id;
+      for (const t of termos) {
+        const normalizedT = normalize(t);
+
+        for (const token of tokens) {
+          // Se o token aparece no termo ou vice-versa, soma ponto
+          if (normalizedT.includes(token) || token.includes(normalizedT)) {
+            score++;
+          }
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestCategoria = id;
       }
     }
 
-    return "11";
+    return bestCategoria;
   }
+
 
   private showMessage(severity: NotificationType, summary: string, message: string) {
     this.messageService.clear();
