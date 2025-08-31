@@ -3,36 +3,38 @@ import { DividerModule } from 'primeng/divider';
 import { CommonModule } from '@angular/common';
 import { MessageService } from 'primeng/api';
 import { NotificationType } from '../../shared/notification-type';
-import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { CardModule } from 'primeng/card';
 import { ChipModule } from 'primeng/chip';
 import { TableModule } from 'primeng/table';
-import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { EntryService } from '../../pages/entries/service/entry.service';
 import { Entry } from '../../pages/entries/model/entry.model';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 import { AuthService } from '../../pages/login/service/auth.service';
+import { EntryFormComponent } from "../entry-form/entry-form.component";
 
 @Component({
   selector: 'app-entry-user',
    imports: [CardModule,
-    ButtonModule, InputTextModule, DialogModule, InputNumberModule,
-    ReactiveFormsModule, CommonModule, DividerModule,
-    ChipModule, TableModule],
+    ButtonModule, DialogModule, InputNumberModule,
+    CommonModule, DividerModule,
+    ChipModule, TableModule, EntryFormComponent],
   templateUrl: './entry-user.component.html',
   styleUrl: './entry-user.component.css'
 })
 export class EntryUserComponent implements OnInit {  
 
   @Input() userName: string = '';
+  isEditing: boolean = false;
   editingEntryId: string | null = null;
   entries: Entry[] = [];
   entryToSave: EntryRequest = new EntryRequest();
+  entryToEdit: EntryRequest = new EntryRequest();
   visible: boolean = false;
   deveExibirBotaoAdicionar: boolean = false;
+
   categorias: { [key: string]: string[] } = {
     "1": ["aluguel", "alugueis", "condominio", "condominios", "iptu", "casa", "casas", "moradia", "moradias"],
     "2": ["mercado", "mercados", "supermercado", "supermercados", "compra", "compras"],
@@ -55,126 +57,42 @@ export class EntryUserComponent implements OnInit {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    console.log('username: ', this.userName);
-    
+  ngOnInit(): void {    
     this.loadEntries();
   }
-
-  form = new FormGroup({
-    description: new FormControl('', [Validators.required]),
-    amount: new FormControl('', [Validators.required])
-  });
-
-  // ========================== INICIO CADASTRO ==========================
-  saveEntry22(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched(); // força exibir mensagens de erro
-      return;
-    }
-    this.visible = false;
-    this.addEntry();
-  }
-
-  saveEntry(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched(); // força exibir mensagens de erro
-      return;
-    }
-    this.setEntryValues();
-    if (this.editingEntryId) { 
-      this.updateEntry(Number(this.editingEntryId));
-    } else {
-       this.setEntryValues();
-      this.addEntry();
-    }
-  }
-
+  
   showCreateDialog() {
-    this.editingEntryId = null; // modo criação
-    this.form.reset();
+    this.isEditing = false;
     this.visible = true;
   }
 
-  showEditDialog(entry: Entry) {
-    this.editingEntryId = entry.id!;
-
-    this.form.patchValue({
-      description: entry.description,
-      amount: entry.amount
-    });
+  showEditDialog(entry: Entry) {   
+    this.entryToEdit = entry
+    this.isEditing = true;
     this.visible = true;
   }
 
-  private setEntryValues(): void {
-    const description = this.form.value.description ?? '';
-    this.entryToSave.description = description;
-    this.entryToSave.amount = this.form.value.amount ?? '';
-    this.entryToSave.categoryId = this.getCategoriaIdByTerm(description);
+  showFormDialog(entry: Entry) {
+    
   }
 
-  private addEntry(): void {
-    this.service.create(this.entryToSave).subscribe({
-      next: () => {
-        this.showMessage(NotificationType.SUCCESS, '', 'Lançamento incluído com sucesso.');
-        this.resetAndClose();
-         this.loadEntries();
-      },
-      error: (err) => {
-        console.error('Erro ao salvar entry:', err);
-        this.showMessage(NotificationType.ERROR, '', 'Erro ao tentar adicionar registro')
-      }
-    });
-  }
-
-  private updateEntry(id: number): void {
-    this.service.update(id, this.entryToSave).subscribe({
-      next: () => {
-        this.showMessage(NotificationType.SUCCESS, '', 'Lançamento atualizado com sucesso.');
-        this.resetAndClose();
-        this.loadEntries();
-      },
-      error: (err) => {
-        this.showMessage(NotificationType.ERROR, '', 'Erro ao tentar atualizar registro');
-      }
-    });
-  }
-
+  
   private showMessage(severity: NotificationType, summary: string, message: string) {
     this.messageService.clear();
     this.messageService.add({ severity: severity, summary: summary, detail: message });
   }
   
+  onCloseDialog() {
+    this.loadEntries();
+    this.visible = false;
+  }
+
+
   private resetAndClose(): void {
-    this.form.reset();
+    // this.form.reset();
     this.visible = false;
     this.editingEntryId = null;
   }
-
-  private getCategoriaIdByTerm(term: string): string {
-    const normalizedTerm = term
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, ""); // Remove acentos
-
-    for (const [id, termos] of Object.entries(this.categorias)) {
-      const normalizedTermos = termos.map(t =>
-        t
-          .trim()
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-      );
-
-      if (normalizedTermos.includes(normalizedTerm)) {
-        return id;
-      }
-    }
-
-    return "11";
-  }
-// ========================== FIM CADASTRO ==========================
 
 // ========================== INICIO TABELA ==========================
 
@@ -197,19 +115,19 @@ export class EntryUserComponent implements OnInit {
 
   getCategoryIcon(categoryId: string): any {    
     const iconsMap: { [key: string]: string } = {
-      '1': 'house',          // Moradia
-      '2': 'cart-shopping',// Supermercado
+      '1': 'house',                         // Moradia
+      '2': 'cart-shopping',                 // Supermercado
       '3': 'lightbulb-dollar',              // Conta Consumo
-      '4': 'gas-pump',     // Transporte
-      '5': 'joystick',           // Lazer
-      '6': 'stethoscope',           // Saúde
-      '7': 'fork-knife',            // Bares e Restaurantes
-      '8': 'screwdriver-wrench',     // Manutenção Casa
-      '9': 'croissant',         // Padaria
-      '10': 'prescription-bottle-medical',       // Farmácia
-      '11': 'list',            // Outros
-      '12': 'cat',                 // Pets
-      '13': 'car-wrench'            // Manutenção Carro
+      '4': 'gas-pump',                      // Transporte
+      '5': 'joystick',                      // Lazer
+      '6': 'stethoscope',                   // Saúde
+      '7': 'fork-knife',                    // Bares e Restaurantes
+      '8': 'screwdriver-wrench',            // Manutenção Casa
+      '9': 'croissant',                     // Padaria
+      '10': 'prescription-bottle-medical',  // Farmácia
+      '11': 'list',                         // Outros
+      '12': 'cat',                          // Pets
+      '13': 'car-wrench'                    // Manutenção Carro
     };
     return iconsMap[categoryId] || 'list';
   }

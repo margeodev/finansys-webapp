@@ -78,7 +78,6 @@ export class EntryService {
   }
 
   private handleError(error: any): Observable<any>{
-    console.log('Erro na requisição => ', error);
     return throwError(error);
   }
 

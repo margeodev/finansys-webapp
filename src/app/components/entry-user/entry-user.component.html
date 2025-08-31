@@ -15,28 +15,7 @@
       <div class="mt-3">
         <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar" [disabled]="deveExibirBotaoAdicionar"/>
           <p-dialog header="Teste" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-              <div class="flex items-center gap-4 mb-4">
-                  <label for="description" class="font-semibold w-24">Descrição</label>
-                  <div class="flex flex-col flex-auto">
-                    <input pInputText id="description"  [formControl]="form.controls['description']" class="flex-auto" autocomplete="off" />
-                    <div *ngIf="form.controls['description'].invalid && form.controls['description'].touched" class="text-red-500 text-sm">
-                      A descrição é obrigatória
-                    </div>
-                  </div>
-              </div>
-              <div class="flex items-center gap-4 mb-4">
-                  <label for="amount" class="font-semibold w-24">Valor</label>
-                  <div class="flex flex-col flex-auto">
-                    <input pInputText [formControl]="form.controls['amount']" inputId="amount" class="flex-auto" autocomplete="off" />
-                    <div *ngIf="form.controls['amount'].invalid && form.controls['amount'].touched" class="text-red-500 text-sm">
-                      O valor é obrigatório
-                    </div>
-                  </div>
-              </div>
-              <div class="flex justify-end gap-2">
-                  <p-button label="Cancel" severity="secondary" (click)="visible = false" />
-                  <p-button label="Save" (click)="saveEntry()" />
-              </div>
+              <app-entry-form (closeDialog)="onCloseDialog()" [entryToEdit]="entryToEdit" [isEditing]="isEditing"></app-entry-form>
           </p-dialog>
       </div>
   </p-card>
@@ -88,7 +67,9 @@
 
           <!-- Ações -->
             <td><div>
-              <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-warning p-button-outlined p-button-sm mr-2" (click)="showEditDialog(entry)"></p-button>
+              <p-button icon="pi pi-pencil" 
+                        styleClass="p-button-rounded p-button-warning p-button-outlined p-button-sm mr-2" 
+                        (click)="showEditDialog(entry)"></p-button>
                     <!-- <p-button (click)="confirm(entry)" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger p-button-outlined p-button-sm"></p-button> -->
                     
                 </div>
