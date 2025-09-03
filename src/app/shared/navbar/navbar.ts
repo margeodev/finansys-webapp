@@ -15,7 +15,7 @@ export class Navbar {
       this.items = [
           {
               label: 'Relatórios',
-              icon: 'pi-globe',
+              icon: 'fa fa-file-chart-pie',
               routerLink: '/reports',
               routerLinkActiveOptions: { exact: true }
           },

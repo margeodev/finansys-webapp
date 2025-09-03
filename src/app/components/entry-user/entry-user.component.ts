@@ -32,6 +32,7 @@ export class EntryUserComponent implements OnInit {
   entryToEdit: EntryRequest = new EntryRequest();
   visible: boolean = false;
   deveExibirBotaoAdicionar: boolean = false;
+  total: number = 0;
 
   constructor(
     private service: EntryService,
@@ -55,9 +56,13 @@ export class EntryUserComponent implements OnInit {
     this.visible = true;
   }
 
-  showFormDialog(entry: Entry) {
-    
+  private calculateTotal(): void {
+    this.total = this.entries
+      .map(entry => parseFloat(entry.amount || '0')) // converte string para número
+      .filter(amount => !isNaN(amount))              // remove valores inválidos
+      .reduce((acc, curr) => acc + curr, 0);         // soma tudo
   }
+
 
   
   private showMessage(severity: NotificationType, summary: string, message: string) {
@@ -85,6 +90,7 @@ export class EntryUserComponent implements OnInit {
     this.service.getByUserAndMonth(this.userName).subscribe({
       next: (data) => {
         this.entries = data;
+        this.calculateTotal(); // atualiza o total após carregar os dados
       },
       error: (err) => {
         this.showMessage(NotificationType.ERROR, '', 'Erro ao carregar lançamentos');

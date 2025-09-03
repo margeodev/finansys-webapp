@@ -2,13 +2,11 @@
   <p-card>
     <div style="display: flex; flex-direction: row; justify-content: space-between;">
         <span class="font-bold block">User:
-          <!-- <span class="font-medium">{{ user }}</span> -->
-          <span class="font-medium">User</span>
+          <span class="font-medium">{{ userName }}</span>
         </span>
 
         <span class="font-bold block">Subtotal:
-          <!-- <span class="font-medium">{{ total | currency: 'BRL': 'symbol':'1.2-2':'pt-BR'}}</span> -->
-          <span class="font-medium">Total</span>
+          <span class="font-medium">{{ total | currency: 'BRL': 'symbol':'1.2-2':'pt-BR'}}</span>
         </span>
       </div>
 
@@ -19,6 +17,7 @@
           </p-dialog>
       </div>
   </p-card>
+  <p-divider />
 
   <div>
     <p-table [value]="entries" 
@@ -43,12 +42,13 @@
         <tr>
           <td>{{ entry.description }}</td>
 
-          <td><p-chip class="!py-0 !pl-0 !pr-4" styleClass="my-custom-chip">
-                <span class="bg-primary text-primary-contrast ml-3 flex items-center justify-center">
-                   <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
-                </span>
-                <span class="ml-2 font-medium">{{ entry?.category?.description }}</span>
-              </p-chip>
+          <td>
+            <p-chip class="!py-0 !pl-0 !pr-4">
+              <span class="bg-primary text-primary-contrast ml-3 flex items-center justify-center">
+                <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
+              </span>
+              <span class="ml-2 font-medium">{{ entry?.category?.description }}</span>
+            </p-chip>
           </td>
 
           <td>{{ entry.date | date: 'dd/MM/yyyy' }}</td>
