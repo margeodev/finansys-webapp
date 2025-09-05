@@ -1,6 +1,15 @@
 <div class="mt-4 mb-4">
-    <app-breadcrumb  [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Relatórios'}]"></app-breadcrumb>
+  <app-breadcrumb [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Relatórios'}]"></app-breadcrumb>
 </div>
 
 <app-page-header page-title="Relatórios"></app-page-header>
 
+<!-- <div class="card flex justify-center">
+    <p-chart type="pie" [data]="data" [options]="options" class="w-full md:w-[30rem]" />
+</div> -->
+
+<div style="width:40%;">
+  <p-card>
+    <p-chart type="pie" [data]="basicData" [options]="basicOptions" class="w-full md:w-[30rem]"></p-chart>
+  </p-card>
+</div>

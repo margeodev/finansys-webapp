@@ -43,7 +43,7 @@
           <td>{{ entry.description }}</td>
 
           <td>
-            <p-chip class="!py-0 !pl-0 !pr-4">
+            <p-chip class="!py-0 !pl-0 !pr-4" [ngStyle]="{ 'background-color': getCategoryColor(entry?.category?.id), 'color': '#fff' }">
               <span class="bg-primary text-primary-contrast ml-3 flex items-center justify-center">
                 <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
               </span>

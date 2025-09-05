@@ -1,17 +1,40 @@
 @import "tailwindcss";
 
 body {
-    /* font-family: var(--font-family); */
-    background-color:rgb(240, 240, 240);
+  /* font-family: var(--font-family); */
+  background-color: rgb(240, 240, 240);
 }
 
- .container {
-    padding-right: 20px;
-    padding-left: 20px;
-    margin-right: auto;
-    margin-left: auto;
-  }
-  /*
+:root {
+  /* Cores do gráfico de despesas */
+  --color-blue: #42A5F5;
+  --color-green: #66BB6A;
+  --color-orange: #FFA726;
+  --color-purple: #AB47BC;
+  --color-deep-orange: #FF7043;
+  --color-cyan: #26C6DA;
+  --color-indigo: #7E57C2;
+  --color-pink: #EC407A;
+  --color-light-green: #9CCC65;
+  --color-yellow: #FFCA28;
+  --color-blue-grey: #5C6BC0;
+  --color-teal: #26A69A;
+  --color-lime: #D4E157;
+
+  /* Cores de texto e grid */
+  --text-color: #495057;
+  --grid-color: #ebedef;
+}
+
+
+.container {
+  padding-right: 20px;
+  padding-left: 20px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/*
   @media (min-width: 768px) {
     .container {
       width: 750px;

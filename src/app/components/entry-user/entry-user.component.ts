@@ -17,14 +17,14 @@ import { EntryFormComponent } from "../entry-form/entry-form.component";
 
 @Component({
   selector: 'app-entry-user',
-   imports: [CardModule,
+  imports: [CardModule,
     ButtonModule, DialogModule, InputNumberModule,
     CommonModule, DividerModule,
     ChipModule, TableModule, EntryFormComponent],
   templateUrl: './entry-user.component.html',
   styleUrl: './entry-user.component.css'
 })
-export class EntryUserComponent implements OnInit {  
+export class EntryUserComponent implements OnInit {
 
   @Input() userName: string = '';
   isEditing: boolean = false;
@@ -38,19 +38,19 @@ export class EntryUserComponent implements OnInit {
     private service: EntryService,
     private messageService: MessageService,
     private authService: AuthService
-  ) {}
+  ) { }
 
-  ngOnInit(): void {        
+  ngOnInit(): void {
     this.loadEntries();
     this.verifyUserPermission();
   }
-  
+
   showCreateDialog() {
     this.isEditing = false;
     this.visible = true;
   }
 
-  showEditDialog(entry: Entry) {   
+  showEditDialog(entry: Entry) {
     this.entryToEdit = entry
     this.isEditing = true;
     this.visible = true;
@@ -64,12 +64,12 @@ export class EntryUserComponent implements OnInit {
   }
 
 
-  
+
   private showMessage(severity: NotificationType, summary: string, message: string) {
     this.messageService.clear();
     this.messageService.add({ severity: severity, summary: summary, detail: message });
   }
-  
+
   onCloseDialog() {
     this.loadEntries();
     this.visible = false;
@@ -77,14 +77,14 @@ export class EntryUserComponent implements OnInit {
 
   verifyUserPermission() {
     const user = this.authService.getLoggedUser();
-    if(this.userName === user?.username) {     
+    if (this.userName === user?.username) {
       this.deveExibirBotaoAdicionar = true;
     } else {
       this.deveExibirBotaoAdicionar = false;
     }
   }
 
-// ========================== INICIO TABELA ==========================
+  // ========================== INICIO TABELA ==========================
 
   private loadEntries(): void {
     this.service.getByUserAndMonth(this.userName).subscribe({
@@ -98,7 +98,7 @@ export class EntryUserComponent implements OnInit {
     });
   }
 
-  getCategoryIcon(categoryId: string): any {    
+  getCategoryIcon(categoryId: string): any {
     const iconsMap: { [key: string]: string } = {
       '1': 'house',                         // Moradia
       '2': 'cart-shopping',                 // Supermercado
@@ -116,4 +116,26 @@ export class EntryUserComponent implements OnInit {
     };
     return iconsMap[categoryId] || 'list';
   }
+
+  getCategoryColor(categoryId: number): string {
+    const colorMap: { [key: number]: string } = {
+      1: '--color-blue',
+      2: '--color-green',
+      3: '--color-orange',
+      4: '--color-purple',
+      5: '--color-deep-orange',
+      6: '--color-cyan',
+      7: '--color-indigo',
+      8: '--color-pink',
+      9: '--color-light-green',
+      10: '--color-yellow',
+      11: '--color-blue-grey',
+      12: '--color-teal',
+      13: '--color-lime'
+    };
+
+    const variableName = colorMap[categoryId] || '--color-blue'; // fallback
+    return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+  }
+
 }
