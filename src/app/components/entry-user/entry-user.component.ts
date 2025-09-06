@@ -13,26 +13,26 @@ import { EntryService } from '../../pages/entries/service/entry.service';
 import { Entry } from '../../pages/entries/model/entry.model';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 import { AuthService } from '../../pages/login/service/auth.service';
-import { EntryFormComponent } from "../entry-form/entry-form.component";
+import { EntryHeaderComponent } from "../entry-header/entry-header.component";
 
 @Component({
   selector: 'app-entry-user',
   imports: [CardModule,
     ButtonModule, DialogModule, InputNumberModule,
     CommonModule, DividerModule,
-    ChipModule, TableModule, EntryFormComponent],
+    ChipModule, TableModule, EntryHeaderComponent],
   templateUrl: './entry-user.component.html',
   styleUrl: './entry-user.component.css'
 })
 export class EntryUserComponent implements OnInit {
 
   @Input() userName: string = '';
+  @Input() totalAmountUser: number = 0;
   isEditing: boolean = false;
   entries: Entry[] = [];
   entryToEdit: EntryRequest = new EntryRequest();
   visible: boolean = false;
   deveExibirBotaoAdicionar: boolean = false;
-  total: number = 0;
 
   constructor(
     private service: EntryService,
@@ -50,29 +50,19 @@ export class EntryUserComponent implements OnInit {
     this.visible = true;
   }
 
+  handleDialogClose() {
+    this.loadEntries();
+  }
+
   showEditDialog(entry: Entry) {
     this.entryToEdit = entry
     this.isEditing = true;
     this.visible = true;
   }
 
-  private calculateTotal(): void {
-    this.total = this.entries
-      .map(entry => parseFloat(entry.amount || '0')) // converte string para número
-      .filter(amount => !isNaN(amount))              // remove valores inválidos
-      .reduce((acc, curr) => acc + curr, 0);         // soma tudo
-  }
-
-
-
   private showMessage(severity: NotificationType, summary: string, message: string) {
     this.messageService.clear();
     this.messageService.add({ severity: severity, summary: summary, detail: message });
-  }
-
-  onCloseDialog() {
-    this.loadEntries();
-    this.visible = false;
   }
 
   verifyUserPermission() {
@@ -90,7 +80,6 @@ export class EntryUserComponent implements OnInit {
     this.service.getByUserAndMonth(this.userName).subscribe({
       next: (data) => {
         this.entries = data;
-        this.calculateTotal(); // atualiza o total após carregar os dados
       },
       error: (err) => {
         this.showMessage(NotificationType.ERROR, '', 'Erro ao carregar lançamentos');

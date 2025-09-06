@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, delay, map, throwError } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { Entry } from '../model/entry.model';
 import { EntryRequest } from '../model/entryRequest.model';
 
@@ -57,6 +57,18 @@ export class EntryService {
     );
   }
 
+  getUserTotal(userName: string): Observable<number> {
+    const url = `${this.apiUrl}/total`;
+    const headers = new HttpHeaders({
+      'userName': userName
+    });
+    
+    return this.http.get<number>(url, { headers }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+
   update(id: number, entry: EntryRequest): Observable<Entry> {
     const url = `${this.apiUrl}/${id}`;
     return this.http.put<Entry>(url, entry).pipe(
@@ -67,7 +79,7 @@ export class EntryService {
 
 
 
-  private jsonDataToEntries(jsonData: any[]): Entry[]{
+  private jsonDataToEntries(jsonData: any[]): Entry[] {
     const categories: Entry[] = [];
     jsonData.forEach(element => categories.push(element as Entry));
     return categories;
@@ -77,7 +89,7 @@ export class EntryService {
     return jsonData as Entry;
   }
 
-  private handleError(error: any): Observable<any>{
+  private handleError(error: any): Observable<any> {
     return throwError(error);
   }
 
