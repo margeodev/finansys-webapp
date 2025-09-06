@@ -1,0 +1,28 @@
+<p-card>
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <span class="font-bold block" class="mb-3">User:
+                <span class="font-medium">{{ userName }}</span>
+            </span>
+            <!-- <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar" [disabled]="!deveExibirBotaoAdicionar" /> -->
+            <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar"/>
+        </div>
+
+        <div>
+            <span class="font-bold block mb-2">Subtotal:
+                <span class="font-medium">{{ subTotal | currency: 'BRL': 'symbol':'1.2-2':'pt-BR'}}</span>
+            </span>
+
+            <span class="font-bold block">Saldo:
+                <span *ngIf="saldo !== null" [ngStyle]="{ color: saldo > 0 ? '#16a34a' : saldo < 0 ? '#ef4444' : '#000' }">
+                    {{ saldo | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
+                </span>
+            </span>
+        </div>
+
+    </div>
+</p-card>
+
+<p-dialog header="Teste" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <app-entry-form (closeDialog)="onCloseDialog()" [isEditing]="isEditing"></app-entry-form>
+</p-dialog>
