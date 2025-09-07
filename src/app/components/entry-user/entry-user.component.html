@@ -1,7 +1,9 @@
 <div>  
-  <app-entry-header (dialogClosed)="handleDialogClose()" [userName]="userName"></app-entry-header>
+  <app-entry-header (dialogClosed)="handleDialogClose()" [user]="user"></app-entry-header>
   <p-divider />
   <div>
+    <app-entry-table></app-entry-table>
+
     <p-table [value]="entries" styleClass="p-datatable-gridlines my-custom-table" showGridlines stripedRows
       [size]="'small'" [paginator]="true" [rows]="15">
 
@@ -37,7 +39,7 @@
             <div>
               <p-button icon="pi pi-pencil"
                 styleClass="p-button-rounded p-button-warning p-button-outlined p-button-sm mr-2"
-                (click)="showEditDialog(entry)"></p-button>
+                (click)="showEditDialog(entry)"></p-button> 
               <!-- <p-button (click)="confirm(entry)" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger p-button-outlined p-button-sm"></p-button> -->
 
             </div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { DividerModule } from 'primeng/divider';
 import { CommonModule } from '@angular/common';
 import { MessageService } from 'primeng/api';
@@ -14,19 +14,22 @@ import { Entry } from '../../pages/entries/model/entry.model';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 import { AuthService } from '../../pages/login/service/auth.service';
 import { EntryHeaderComponent } from "../entry-header/entry-header.component";
+import { EntryTableComponent } from "../entry-table/entry-table.component";
+import { User } from '../../pages/login/model/user.model';
 
 @Component({
   selector: 'app-entry-user',
   imports: [CardModule,
     ButtonModule, DialogModule, InputNumberModule,
     CommonModule, DividerModule,
-    ChipModule, TableModule, EntryHeaderComponent],
+    ChipModule, TableModule, EntryHeaderComponent, EntryTableComponent],
   templateUrl: './entry-user.component.html',
   styleUrl: './entry-user.component.css'
 })
-export class EntryUserComponent implements OnInit {
+export class EntryUserComponent implements OnChanges {
 
-  @Input() userName: string = '';
+  // @Input() userName: string = '';
+  @Input() user: User | null = null;
   @Input() totalAmountUser: number = 0;
   isEditing: boolean = false;
   entries: Entry[] = [];
@@ -40,9 +43,11 @@ export class EntryUserComponent implements OnInit {
     private authService: AuthService
   ) { }
 
-  ngOnInit(): void {
-    this.loadEntries();
-    this.verifyUserPermission();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['user'] && changes['user'].currentValue) {      
+      this.loadEntries();
+      this.verifyUserPermission();
+    }
   }
 
   showCreateDialog() {
@@ -67,7 +72,7 @@ export class EntryUserComponent implements OnInit {
 
   verifyUserPermission() {
     const user = this.authService.getLoggedUser();
-    if (this.userName === user?.username) {
+    if (this.user === user?.username) {
       this.deveExibirBotaoAdicionar = true;
     } else {
       this.deveExibirBotaoAdicionar = false;
@@ -76,9 +81,9 @@ export class EntryUserComponent implements OnInit {
 
   // ========================== INICIO TABELA ==========================
 
-  private loadEntries(): void {
-    this.service.getByUserAndMonth(this.userName).subscribe({
-      next: (data) => {
+  private loadEntries(): void {    
+    this.service.getByUserAndMonth(this.user!.username!).subscribe({
+      next: (data) => {        
         this.entries = data;
       },
       error: (err) => {

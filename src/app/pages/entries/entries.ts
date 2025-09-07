@@ -1,13 +1,15 @@
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { forkJoin, Subscription } from "rxjs";
 import { DividerModule } from "primeng/divider";
 import { EntryUserComponent } from "../../components/entry-user/entry-user.component";
 import { SharedStateService } from "../../shared/service/shared-state-service";
 import { AuthService } from "../login/service/auth.service";
 import { EntryService } from "./service/entry.service";
 import { CommonModule } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
-import { forkJoin } from "rxjs";
 import { CustomBreadcrumb } from "../../shared/breadcrumb/custom-breadcrumb";
 import { PageHeader } from "../../shared/page-header/page-header";
+import { UserService } from "./service/user.service";
+import { User } from "../login/model/user.model";
 
 @Component({
   selector: 'app-entries',
@@ -15,20 +17,28 @@ import { PageHeader } from "../../shared/page-header/page-header";
   templateUrl: './entries.html',
   styleUrl: './entries.css'
 })
-export class Entries implements OnInit {
+export class Entries implements OnInit, OnDestroy {
+  userOne: User | null = null;
+  userTwo: User | null = null;
 
-  user: string = '';
+  private userSub?: Subscription;
+  private totalSub?: Subscription;
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private entryService: EntryService,
     private sharedState: SharedStateService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const userName = this.authService.getLoggedUser();
-    this.user = userName ? userName.username : '';
-    this.getTotalToUsers();
+    this.getUsers();
+  }
+
+  ngOnDestroy(): void {
+    this.userSub?.unsubscribe();
+    this.totalSub?.unsubscribe();
   }
 
   private calculateSaldo(one: number, two: number): void {
@@ -46,11 +56,10 @@ export class Entries implements OnInit {
     }
   }
 
-
-  private getTotalToUsers(): void {
-    forkJoin([
-      this.entryService.getUserTotal('Marcio'),
-      this.entryService.getUserTotal('Ana Flavia')
+  private getTotalToUsers(userOneName: string, userTwoName: string): void {
+    this.totalSub = forkJoin([
+      this.entryService.getUserTotal(userOneName),
+      this.entryService.getUserTotal(userTwoName)
     ]).subscribe({
       next: ([totalOne, totalTwo]) => {
         this.sharedState.totalUserOne$.next(totalOne);
@@ -58,6 +67,27 @@ export class Entries implements OnInit {
         this.calculateSaldo(totalOne, totalTwo);
       },
       error: (err) => console.error('Erro ao buscar totais:', err)
+    });
+  }
+
+  private getUsers(): void {
+    this.userSub = this.userService.getAll().subscribe({
+      next: (users) => {
+        const userOne = users[0];
+        const userTwo = users[1];
+
+        if (userOne && userTwo) {
+          this.sharedState.userOne$.next(userOne);
+          this.sharedState.userTwo$.next(userTwo);
+          this.userOne = userOne;
+          this.userTwo = userTwo;
+
+          this.getTotalToUsers(userOne.username!, userTwo.username!);
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao carregar usuários:', err);
+      }
     });
   }
 }

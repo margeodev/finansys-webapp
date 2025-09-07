@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { User } from '../../pages/login/model/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class SharedStateService {
@@ -8,5 +9,8 @@ export class SharedStateService {
 
   saldoUserOne$ = new BehaviorSubject<number | null>(null);
   saldoUserTwo$ = new BehaviorSubject<number | null>(null);
+
+  userOne$ = new BehaviorSubject<User | null>(null);
+  userTwo$ = new BehaviorSubject<User | null>(null);
 }
 
