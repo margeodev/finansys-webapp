@@ -27,7 +27,7 @@ export class EntryHeaderComponent implements OnInit {
     if (this.userName.toLowerCase() === 'marcio') {
       this.sharedState.totalUserOne$.subscribe(t => this.subTotal = t);
       this.sharedState.saldoUserOne$.subscribe(s => this.saldo = s);
-    } else if (this.userName.toLowerCase() === 'ana') {
+    } else if (this.userName.toLowerCase() === 'ana flavia') {
       this.sharedState.totalUserTwo$.subscribe(t => this.subTotal = t);
       this.sharedState.saldoUserTwo$.subscribe(s => this.saldo = s);
     }

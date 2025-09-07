@@ -50,7 +50,7 @@ export class Entries implements OnInit {
   private getTotalToUsers(): void {
     forkJoin([
       this.entryService.getUserTotal('Marcio'),
-      this.entryService.getUserTotal('Ana')
+      this.entryService.getUserTotal('Ana Flavia')
     ]).subscribe({
       next: ([totalOne, totalTwo]) => {
         this.sharedState.totalUserOne$.next(totalOne);
