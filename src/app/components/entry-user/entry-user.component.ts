@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { DividerModule } from 'primeng/divider';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
@@ -7,12 +7,12 @@ import { CardModule } from 'primeng/card';
 import { ChipModule } from 'primeng/chip';
 import { TableModule } from 'primeng/table';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { Entry } from '../../pages/entries/model/entry.model';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 import { AuthService } from '../../pages/login/service/auth.service';
 import { EntryHeaderComponent } from "../entry-header/entry-header.component";
 import { EntryTableComponent } from "../entry-table/entry-table.component";
 import { User } from '../../pages/login/model/user.model';
+import { UserHeader } from '../../pages/entries/model/user-header.model';
 
 @Component({
   selector: 'app-entry-user',
@@ -23,24 +23,20 @@ import { User } from '../../pages/login/model/user.model';
   templateUrl: './entry-user.component.html',
   styleUrl: './entry-user.component.css'
 })
-export class EntryUserComponent {
+export class EntryUserComponent implements OnInit {
 
   @Input() user: User | null = null;
-  @Input() totalAmountUser: number = 0;
-  isEditing: boolean = false;
-  entries: Entry[] = [];
+  @Input() userHeader: UserHeader | null = null;
   entryToEdit: EntryRequest = new EntryRequest();
   visible: boolean = false;
-  deveExibirBotaoAdicionar: boolean = false;
 
   shouldReloadTable: boolean = false;
 
-  constructor(
-    private authService: AuthService
-  ) { }
+  ngOnInit(): void {   
+  }
 
+  
   showCreateDialog() {
-    this.isEditing = false;
     this.visible = true;
   }
 
@@ -48,12 +44,4 @@ export class EntryUserComponent {
     this.shouldReloadTable = true;
   }
 
-  verifyUserPermission() {
-    const user = this.authService.getLoggedUser();
-    if (this.user === user?.username) {
-      this.deveExibirBotaoAdicionar = true;
-    } else {
-      this.deveExibirBotaoAdicionar = false;
-    }
-  }
 }

@@ -7,6 +7,7 @@ export class Entry {
         public description?: string,
         public category?: Category,
         public user?: User,
-        public amount?: string
+        public amount?: string,
+        public advancePayment?: boolean
     ) {}
 }

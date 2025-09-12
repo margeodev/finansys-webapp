@@ -7,7 +7,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { NotificationType } from '../../shared/notification-type';
 import { MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
-import { AuthService } from '../../pages/login/service/auth.service';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 
 @Component({
@@ -41,8 +40,7 @@ export class EntryFormComponent implements OnInit {
 
   constructor(
     private service: EntryService,
-    private messageService: MessageService,
-    private authService: AuthService
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {

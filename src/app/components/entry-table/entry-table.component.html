@@ -1,43 +1,39 @@
-    <p-table [value]="entries" styleClass="p-datatable-gridlines my-custom-table" showGridlines stripedRows
-      [size]="'small'" [paginator]="true" [rows]="15">
+<p-table [value]="entries" styleClass="p-datatable-gridlines my-custom-table" showGridlines stripedRows [size]="'small'"
+  [paginator]="true" [rows]="15">
 
-      <ng-template pTemplate="header">
-        <tr>
-          <th class="col-descricao">Descrição</th>
-          <th class="col-category">Categoria</th>
-          <th class="col-data">Data</th>
-          <th class="col-valor">Valor</th>
-          <th class="col-acoes">Ações</th>
-        </tr>
-      </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th class="col-descricao">Descrição</th>
+      <th class="col-category">Categoria</th>
+      <th class="col-data">Data</th>
+      <th class="col-valor">Valor</th>
+      <th class="col-acoes">Pago</th>
+    </tr>
+  </ng-template>
+  
+  <ng-template pTemplate="body" let-entry>
+    <tr>
+      <td>{{ entry.description }}</td>
 
-      <ng-template pTemplate="body" let-entry>
-        <tr>
-          <td>{{ entry.description }}</td>
+      <td>
+        <p-chip class="!py-0 !pl-0 !pr-4"
+          [ngStyle]="{ 'background-color': getCategoryColor(entry?.category?.id), 'color': '#fff' }">
+          <span class="bg-primary text-primary-contrast ml-3 flex items-center justify-center">
+            <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
+          </span>
+          <span class="ml-2 font-medium">{{ entry?.category?.description }}</span>
+        </p-chip>
+      </td>
 
-          <td>
-            <p-chip class="!py-0 !pl-0 !pr-4"
-              [ngStyle]="{ 'background-color': getCategoryColor(entry?.category?.id), 'color': '#fff' }">
-              <span class="bg-primary text-primary-contrast ml-3 flex items-center justify-center">
-                <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
-              </span>
-              <span class="ml-2 font-medium">{{ entry?.category?.description }}</span>
-            </p-chip>
-          </td>
+      <td>{{ entry.date | date: 'dd/MM/yyyy' }}</td>
 
-          <td>{{ entry.date | date: 'dd/MM/yyyy' }}</td>
+      <td>{{ entry.amount | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</td>
 
-          <td>{{ entry.amount | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</td>
-
-          <td>
-            <div>
-              <p-button icon="pi pi-pencil"
-                styleClass="p-button-rounded p-button-warning p-button-outlined p-button-sm mr-2"
-                (click)="showEditDialog(entry)"></p-button> 
-              <!-- <p-button (click)="confirm(entry)" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger p-button-outlined p-button-sm"></p-button> -->
-
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+      <td>
+        <div>
+          <p-toggleswitch [(ngModel)]="entry.advancePayment" />
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

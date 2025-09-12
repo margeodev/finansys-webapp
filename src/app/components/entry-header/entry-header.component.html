@@ -4,16 +4,20 @@
             <span class="font-bold block" class="mb-3">User:
                 <span class="font-medium">{{ userName }}</span>
             </span>
-            <!-- <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar" [disabled]="!deveExibirBotaoAdicionar" /> -->
             <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar"/>
         </div>
-
+        
+        <p-divider layout="vertical" />
         <div>
-            <span class="font-bold block mb-2">Subtotal:
+            <span>Subtotal:
                 <span class="font-medium">{{ subTotal | currency: 'BRL': 'symbol':'1.2-2':'pt-BR'}}</span>
             </span>
+            
+            <span class="block">Adiantamento:
+                <span class="font-medium">{{ advance | currency: 'BRL': 'symbol':'1.2-2':'pt-BR'}}</span>
+            </span>
 
-            <span class="font-bold block">Saldo:
+            <span class="block">Saldo:
                 <span *ngIf="saldo !== null" [ngStyle]="{ color: saldo > 0 ? '#16a34a' : saldo < 0 ? '#ef4444' : '#000' }">
                     {{ saldo | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
                 </span>

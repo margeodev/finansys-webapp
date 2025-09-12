@@ -1,40 +1,40 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
-import { AuthService } from '../../pages/login/service/auth.service';
 import { NotificationType } from '../../shared/notification-type';
 import { Entry } from '../../pages/entries/model/entry.model';
 import { TableModule } from "primeng/table";
 import { ChipModule } from 'primeng/chip';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { User } from '../../pages/login/model/user.model';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { FormsModule } from '@angular/forms';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-entry-table',
-  imports: [TableModule, ChipModule, CommonModule, ButtonModule],
+  imports: [TableModule, ChipModule, CommonModule, ButtonModule, ToggleSwitchModule, FormsModule, SkeletonModule],
   templateUrl: './entry-table.component.html',
   styleUrl: './entry-table.component.css'
 })
 export class EntryTableComponent implements OnChanges {
 
-  @Input() user: User | null = null;
+  @Input() userName: string | null = null;
   @Input() reloadTrigger: boolean = false;
 
   entries: Entry[] = [];
+  isLoading: boolean = false;
   isEditing: boolean = false;
   visible: boolean = false
 
   constructor(
     private service: EntryService,
-    private messageService: MessageService,
-    private authService: AuthService
+    private messageService: MessageService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['user'] && changes['user'].currentValue) {
+    if (changes['userName'] && changes['userName'].currentValue) {
       this.loadEntries();
-      // this.verifyUserPermission();
     }
 
     // Quando o gatilho de reload é ativado
@@ -44,18 +44,20 @@ export class EntryTableComponent implements OnChanges {
   }
 
   private loadEntries(): void {
-    this.service.getByUserAndMonth(this.user!.username!).subscribe({
-      next: (data) => {
+    this.isLoading = true;
+    this.service.getByUserAndMonth(this.userName!).subscribe({
+      next: (data) => {        
         this.entries = data;
+        this.isLoading = false;
       },
       error: (err) => {
+        this.isLoading = false;
         this.showMessage(NotificationType.ERROR, '', 'Erro ao carregar lançamentos');
       }
     });
   }
 
   showEditDialog(entry: Entry) {
-    // this.entryToEdit = entry
     this.isEditing = true;
     this.visible = true;
   }

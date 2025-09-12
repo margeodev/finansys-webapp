@@ -1,12 +1,7 @@
 <div>  
-  <app-entry-header (dialogClosed)="handleDialogClose()" [user]="user"></app-entry-header>
+  <app-entry-header (dialogClosed)="handleDialogClose()" [userHeader]="userHeader"></app-entry-header>
   <p-divider />
   <div>
-    <app-entry-table [user]="user" [reloadTrigger]="shouldReloadTable"></app-entry-table>
+    <app-entry-table [userName]="userHeader!.userName!" [reloadTrigger]="shouldReloadTable"></app-entry-table>
   </div>
 </div>
-
-<p-dialog header="Teste" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-    <!-- <app-entry-form (closeDialog)="onCloseDialog()" [isEditing]="isEditing"></app-entry-form> -->
-     <h1>teste</h1>
-</p-dialog>

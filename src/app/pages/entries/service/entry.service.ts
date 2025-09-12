@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { Entry } from '../model/entry.model';
 import { EntryRequest } from '../model/entryRequest.model';
+import { BalanceResponse } from '../model/balance.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,13 +21,13 @@ export class EntryService {
     );
   }
 
-  delete(id: number): Observable<any> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.delete(url).pipe(
-      catchError(this.handleError),
-      map(() => null)
-    );
-  }
+  // delete(id: number): Observable<any> {
+  //   const url = `${this.apiUrl}/${id}`;
+  //   return this.http.delete(url).pipe(
+  //     catchError(this.handleError),
+  //     map(() => null)
+  //   );
+  // }
 
   create(entry: EntryRequest): Observable<EntryRequest> {
     return this.http.post<Entry>(this.apiUrl, entry).pipe(
@@ -35,14 +36,14 @@ export class EntryService {
     );
   }
 
-  getById(id: number): Observable<Entry> {
-    const url = `${this.apiUrl}/${id}`;
+  // getById(id: number): Observable<Entry> {
+  //   const url = `${this.apiUrl}/${id}`;
 
-    return this.http.get(url).pipe(
-      catchError(this.handleError),
-      map(this.jsonToEntry)
-    );
-  }
+  //   return this.http.get(url).pipe(
+  //     catchError(this.handleError),
+  //     map(this.jsonToEntry)
+  //   );
+  // }
 
   getByUserAndMonth(userName: string): Observable<Entry[]> {
     const url = `${this.apiUrl}/current-month`;
@@ -57,13 +58,13 @@ export class EntryService {
     );
   }
 
-  getUserTotal(userName: string): Observable<number> {
+  getUserTotal(userName: string): Observable<BalanceResponse> {
     const url = `${this.apiUrl}/total`;
     const headers = new HttpHeaders({
       'userName': userName
     });
     
-    return this.http.get<number>(url, { headers }).pipe(
+    return this.http.get<BalanceResponse>(url, { headers }).pipe(
       catchError(this.handleError)
     );
   }

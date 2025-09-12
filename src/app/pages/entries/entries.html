@@ -1,17 +1,29 @@
-
-
 <div class="mt-4 mb-4">
-    <app-breadcrumb  [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Entradas'}]"></app-breadcrumb>
+  <app-breadcrumb [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Entradas'}]"></app-breadcrumb>
 </div>
 
 <app-page-header page-title="Lista de Entradas"></app-page-header>
-                 
+
 <p-divider />
 
-<div class="flex gap-4">
-  <app-entry-user [user]="userOne"></app-entry-user>
-  
-  <p-divider layout="vertical"/>
-  
-  <app-entry-user [user]="userTwo"></app-entry-user>
-</div>
+<ng-container *ngIf="userOneHeader != null; else loading">
+  <div class="flex gap-4">
+    <app-entry-user [userHeader]="userOneHeader"></app-entry-user>
+
+    <p-divider layout="vertical"/>
+
+    <app-entry-user [userHeader]="userTwoHeader"></app-entry-user>
+  </div>
+</ng-container>
+
+<ng-template #loading>
+  <div class="flex flex-col items-center justify-center h-64">
+    <p-progressSpinner 
+      styleClass="custom-spinner" 
+      strokeWidth="4" 
+      animationDuration=".5s" 
+      [style]="{width: '50px', height: '50px'}">
+    </p-progressSpinner>
+    <p class="mt-4 text-gray-500">Carregando usuários...</p>
+  </div>
+</ng-template>
