@@ -1,7 +1,6 @@
 import { Component, OnInit} from "@angular/core";
 import { catchError, forkJoin, Observable, of } from "rxjs";
 import { DividerModule } from "primeng/divider";
-import { EntryUserComponent } from "../../components/entry-user/entry-user.component";
 import { EntryService } from "./service/entry.service";
 import { CommonModule } from "@angular/common";
 import { CustomBreadcrumb } from "../../shared/breadcrumb/custom-breadcrumb";
@@ -11,19 +10,23 @@ import { User } from "../login/model/user.model";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { UserHeader } from "./model/user-header.model";
 import { BalanceResponse } from "./model/balance.model";
+import { EntryHeaderComponent } from "../../components/entry-header/entry-header.component";
+import { EntryTableComponent } from "../../components/entry-table/entry-table.component";
 
 @Component({
   selector: 'app-entries',
-  imports: [CustomBreadcrumb, ProgressSpinnerModule, PageHeader, CommonModule, DividerModule, EntryUserComponent],
+  imports: [CustomBreadcrumb, ProgressSpinnerModule, PageHeader, CommonModule, DividerModule, EntryHeaderComponent, EntryTableComponent],
   templateUrl: './entries.html',
   styleUrl: './entries.css'
 })
 export class Entries implements OnInit {
+[x: string]: any;
   users: User[] = [];
   userNameOne: string = '';
   userNameTwo: string = ''
   userOneHeader: UserHeader | null = null;
   userTwoHeader: UserHeader | null = null;
+  shouldReloadTable: boolean = false;
 
   constructor(
     private userService: UserService,
@@ -129,6 +132,10 @@ export class Entries implements OnInit {
         return of(new BalanceResponse(0, 0)); // fallback seguro
       })
     );
+  }
+
+  handleDialogClose() {
+    this.shouldReloadTable = true;
   }
 
 }

@@ -8,20 +8,25 @@
 
 <ng-container *ngIf="userOneHeader != null; else loading">
   <div class="flex gap-4">
-    <app-entry-user [userHeader]="userOneHeader"></app-entry-user>
+    <div class="flex flex-col" style="flex-direction: column;">
+      <app-entry-header (dialogClosed)="handleDialogClose()" [userHeader]="userOneHeader"></app-entry-header>
+      <p-divider />
+      <app-entry-table [userName]="userOneHeader!.userName!" [reloadTrigger]="shouldReloadTable"></app-entry-table>
+    </div>
 
-    <p-divider layout="vertical"/>
+    <p-divider layout="vertical" />
 
-    <app-entry-user [userHeader]="userTwoHeader"></app-entry-user>
+    <div class="flex flex-col" style="flex-direction: column;">
+      <app-entry-header (dialogClosed)="handleDialogClose()" [userHeader]="userTwoHeader"></app-entry-header>
+      <p-divider />
+      <app-entry-table [userName]="userTwoHeader!.userName!" [reloadTrigger]="shouldReloadTable"></app-entry-table>
+    </div>
   </div>
 </ng-container>
 
 <ng-template #loading>
   <div class="flex flex-col items-center justify-center h-64">
-    <p-progressSpinner 
-      styleClass="custom-spinner" 
-      strokeWidth="4" 
-      animationDuration=".5s" 
+    <p-progressSpinner styleClass="custom-spinner" strokeWidth="4" animationDuration=".5s"
       [style]="{width: '50px', height: '50px'}">
     </p-progressSpinner>
     <p class="mt-4 text-gray-500">Carregando usuários...</p>
