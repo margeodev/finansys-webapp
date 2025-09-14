@@ -1,4 +1,4 @@
-import { Component, OnInit} from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { catchError, forkJoin, Observable, of } from "rxjs";
 import { DividerModule } from "primeng/divider";
 import { EntryService } from "./service/entry.service";
@@ -20,7 +20,7 @@ import { EntryTableComponent } from "../../components/entry-table/entry-table.co
   styleUrl: './entries.css'
 })
 export class Entries implements OnInit {
-[x: string]: any;
+  [x: string]: any;
   users: User[] = [];
   userNameOne: string = '';
   userNameTwo: string = ''
@@ -47,69 +47,33 @@ export class Entries implements OnInit {
           this.getUserBalance(users[1].username!)
         ]).subscribe({
           next: ([balance1, balance2]) => {
-            const advance1 = (balance2.totalAdvanceBalance ?? 0) / 2;
-            const advance2 = (balance1.totalAdvanceBalance ?? 0) / 2;
-            const subTotalBalanceOne = balance1.subTotalBalance ?? 0;
-            const subTotalBalanceTwo = balance2.subTotalBalance ?? 0;
-
-            let saldo1: number = 0;
-            let saldo2: number = 0;
-            if (advance1 === 0 && advance2 === 0) {
-              console.log('Cenario 1 - Nenhum adiantamento');
-              saldo1 = this.calculateSaldoDefault(subTotalBalanceOne, subTotalBalanceTwo);
-              saldo2 = saldo1 * -1;
-            }
+            let subTotalBalanceOne = balance1.subTotalBalance ?? 0;
+            let subTotalBalanceTwo = balance2.subTotalBalance ?? 0;
+            let advance1 = balance1.totalAdvanceBalance ?? 0;
+            let advance2 = balance2.totalAdvanceBalance ?? 0;
+            advance1 = advance1 / 2;
+            advance2 = advance2 / 2;
+            subTotalBalanceOne = subTotalBalanceOne - advance1;
+            subTotalBalanceTwo = subTotalBalanceTwo - advance2;
+            console.log('adiantamento 1:', advance1);
+            console.log('adiantamento 2:', advance2);
             
-            else if (advance1 > 0 && advance2 === 0) {
-              console.log('Cenario 2 - Usuario 1 pagou adiantado');
-              if(subTotalBalanceOne === subTotalBalanceTwo) {
-                console.log('Cenario 2.1 - Subtotais iguais');                
-                saldo1 = advance1;
-                saldo2 = saldo1 * -1;
-              }
-              if(subTotalBalanceOne < subTotalBalanceTwo) {
-                console.log('Cenario 2.2 - Subtotal 1 menor que subtotal 2');
-                saldo2 = this.calculateSaldoDefault(subTotalBalanceTwo, subTotalBalanceOne) - advance1;
-                saldo1 = saldo2 * -1;
-              }
-              if(subTotalBalanceOne > subTotalBalanceTwo) {
-                console.log('Cenario 2.3 - Subtotal 1 maior que subtotal 2');
-                saldo1 = this.calculateSaldoDefault(subTotalBalanceOne, subTotalBalanceTwo) + advance1;
-                saldo2 = saldo1 * -1;
-              }              
-              
-            }
+            let total1 = subTotalBalanceOne + advance1 + advance2;
+            let total2 = subTotalBalanceTwo + advance2 + advance1;
 
-            else if (advance1 === 0 && advance2 > 0) {
-              console.log('Cenario 3 - Usuario 2 pagou adiantado');
-              if(subTotalBalanceOne === subTotalBalanceTwo) {
-                console.log('Cenario 3.1 - Subtotais iguais');                
-                saldo2 = advance2;
-                saldo1 = saldo2 * -1;
-              }            
-              if(subTotalBalanceOne < subTotalBalanceTwo) {
-                console.log('Cenario 3.2 - Subtotal 1 menor que subtotal 2');
-                saldo2 = this.calculateSaldoDefault(subTotalBalanceTwo, subTotalBalanceOne) + advance2;
-                saldo1 = saldo2 * -1;
-              }
+            let saldo1: number = this.calculateSaldoDefault(subTotalBalanceOne, subTotalBalanceTwo);
+            let saldo2: number = -saldo1;
 
-               if(subTotalBalanceOne > subTotalBalanceTwo) {
-                console.log('Cenario 3.3 - Subtotal 1 maior que subtotal 2');
-                saldo1 = this.calculateSaldoDefault(subTotalBalanceOne, subTotalBalanceTwo) - advance2;
-                saldo2 = saldo1 * -1;
-              } 
-            }
-            
             this.userOneHeader = new UserHeader(
               users[0].username!,
-              balance1.subTotalBalance,
+              total1,
               advance1,
               saldo1
             );
-            
+
             this.userTwoHeader = new UserHeader(
               users[1].username!,
-              balance2.subTotalBalance ?? 0,
+              total2,
               advance2,
               saldo2
             );
@@ -119,9 +83,12 @@ export class Entries implements OnInit {
       },
       error: (err) => console.error('Erro ao buscar usuários:', err)
     });
-  }  
+  }
 
   private calculateSaldoDefault(subTotalOne: number, subTotalTwo: number): number {
+    if (subTotalOne === subTotalTwo) {
+      return 0;
+    }
     return (subTotalOne - subTotalTwo) / 2;
   }
 
