@@ -1,15 +1,5 @@
-.chart-legend {
-  color: var(--text-color);
-}
-
-.chart-grid {
-  border-color: var(--grid-color);
-}
-
-.bar-blue {
-  background-color: var(--color-blue);
-}
-
-.bar-orange {
-  background-color: var(--color-orange);
+.chart {
+  height: 400px;
+  padding: 2rem;
+  height: 500px;
 }

@@ -1,89 +1,122 @@
-import { ChangeDetectorRef, Component, effect, inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { CustomBreadcrumb } from "../../shared/breadcrumb/custom-breadcrumb";
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { PageHeader } from "../../shared/page-header/page-header";
-import { ChartModule } from 'primeng/chart';
-import { Card } from "primeng/card";
+import { Component, OnInit } from '@angular/core';
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import * as echarts from 'echarts/core';
+import { PieChart } from 'echarts/charts';
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { ReportService } from './service/report.service';
-import { ReportModel } from './model/report.model';
+import { PageHeader } from "../../shared/page-header/page-header";
+import { Card } from "primeng/card";
+import { CustomBreadcrumb } from "../../shared/breadcrumb/custom-breadcrumb";
+
+// Registra os componentes usados pelo ECharts
+echarts.use([
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  CanvasRenderer
+]);
 
 @Component({
   selector: 'app-reports',
-  imports: [CustomBreadcrumb, CommonModule, PageHeader, ChartModule, Card],
+  standalone: true,
+  imports: [NgxEchartsDirective, PageHeader, Card, CustomBreadcrumb],
+  providers: [provideEchartsCore({ echarts })],
   templateUrl: './reports.component.html',
-  styleUrl: './reports.component.css'
+  styleUrls: ['./reports.component.css']
 })
 export class ReportsComponent implements OnInit {
-  basicData: any;
-  basicOptions: any;
 
-  reports: ReportModel[] = [];
+  chartData: any[] = [];
+  chartOptions: any;
 
-  constructor(private reportService: ReportService) {}
+  colorList: string[] = [
+    '--color-blue', '--color-green', '--color-orange', '--color-purple',
+    '--color-deep-orange', '--color-cyan', '--color-indigo', '--color-pink',
+    '--color-light-green', '--color-yellow', '--color-blue-grey',
+    '--color-teal', '--color-lime'
+  ];
 
-  ngOnInit() {
+  constructor(private reportService: ReportService) { }
+
+  ngOnInit(): void {
     this.getReport();
-
-    this.basicOptions = {
-      responsive: true,
-      plugins: {
-        legend: {
-          labels: {
-            color: this.getCssVariable('--text-color')
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: this.getCssVariable('--text-color')
-          },
-          grid: {
-            color: this.getCssVariable('--grid-color')
-          }
-        },
-        y: {
-          ticks: {
-            color: this.getCssVariable('--text-color')
-          },
-          grid: {
-            color: this.getCssVariable('--grid-color')
-          }
-        }
-      }
-    };
   }
 
-  getReport(monthsBack: number = 0) {
+  getReport(monthsBack: number = 0): void {
     this.reportService.getByMonth(monthsBack.toString()).subscribe({
       next: (data) => {
-        this.reports = data;
-        console.log('Relatórios recebidos:', this.reports);
+        const chartData = data.map((r: any) => ({
+          value: Number(r.total),
+          name: r.categoryDescription
+        }));
 
-        // Monta os dados do gráfico a partir do backend
-        this.basicData = {
-          labels: this.reports.map(r => r.categoryDescription),
-          datasets: [
+        const colors = data.map((_: any, i: number) =>
+          this.getCssVariable(this.colorList[i % this.colorList.length])
+        );
+
+        this.chartOptions = {
+          title: {
+            text: 'Despesas por Categoria',
+            top: 0,
+            left: 'center',
+            textStyle: {
+              fontSize: 22,
+              fontWeight: 'bold',
+              color: '#334155',              
+            }
+          },
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            orient: 'vertical',
+            top: 60,
+            left: 'left',
+            type: 'scroll',
+            itemWidth: 14,
+            itemHeight: 14,
+            icon: 'circle',
+            textStyle: {
+              color: '#333',
+              fontSize: 14
+            },
+            formatter: (name: any) => ` ${name}`,
+            backgroundColor: '#f9f9f9',
+            borderColor: '#ccc',
+            borderWidth: 1,
+            padding: [20, 20]
+          },
+          color: colors,
+          series: [
             {
-              label: 'Despesas',
-              data: this.reports.map(r => Number(r.total)),
-              backgroundColor: [
-                this.getCssVariable('--color-blue'),
-                this.getCssVariable('--color-green'),
-                this.getCssVariable('--color-orange'),
-                this.getCssVariable('--color-purple'),
-                this.getCssVariable('--color-deep-orange'),
-                this.getCssVariable('--color-cyan'),
-                this.getCssVariable('--color-indigo'),
-                this.getCssVariable('--color-pink'),
-                this.getCssVariable('--color-light-green'),
-                this.getCssVariable('--color-yellow'),
-                this.getCssVariable('--color-blue-grey'),
-                this.getCssVariable('--color-teal'),
-                this.getCssVariable('--color-lime')
-              ]
+              name: 'Despesas',
+              top: 40,
+              type: 'pie',
+              radius: ['20%', '80%'],
+              center: ['55%', '50%'],
+              data: chartData,
+              label: {
+                show: true,
+                formatter: '{b}: R$ {c}',
+                fontSize: 14,
+                color: '#333'
+              },
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
             }
           ]
+
         };
       },
       error: (err) => console.error('Erro ao carregar relatórios:', err)
@@ -94,4 +127,7 @@ export class ReportsComponent implements OnInit {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
+  onSelect(event: any): void {
+    console.log('Selecionado:', event);
+  }
 }

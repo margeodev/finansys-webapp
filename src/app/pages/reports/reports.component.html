@@ -4,12 +4,10 @@
 
 <app-page-header page-title="Relatórios"></app-page-header>
 
-<!-- <div class="card flex justify-center">
-    <p-chart type="pie" [data]="data" [options]="options" class="w-full md:w-[30rem]" />
-</div> -->
-
-<div style="width:40%;">
+<div>
   <p-card>
-    <p-chart type="pie" [data]="basicData" [options]="basicOptions" class="w-full md:w-[30rem]"></p-chart>
+    <div class="chart-container">
+      <div echarts [options]="chartOptions" class="chart"></div>
+    </div>
   </p-card>
 </div>

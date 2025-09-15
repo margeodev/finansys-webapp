@@ -55,8 +55,6 @@ export class Entries implements OnInit {
             advance2 = advance2 / 2;
             subTotalBalanceOne = subTotalBalanceOne - advance1;
             subTotalBalanceTwo = subTotalBalanceTwo - advance2;
-            console.log('adiantamento 1:', advance1);
-            console.log('adiantamento 2:', advance2);
             
             let total1 = subTotalBalanceOne + advance1 + advance2;
             let total2 = subTotalBalanceTwo + advance2 + advance1;
