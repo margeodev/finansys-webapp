@@ -1,7 +1,7 @@
 <p-card>
     <div style="display: flex; flex-direction: row; justify-content: space-between;">
         <div style="display: flex; flex-direction: column; justify-content: space-between;">
-            <span class="font-bold block" class="mb-3">User:
+            <span class="font-bold block" class="mb-3">Usuário:
                 <span class="font-medium">{{ userName }}</span>
             </span>
             <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar"/>
@@ -28,5 +28,5 @@
 </p-card>
 
 <p-dialog header="Teste" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
-    <app-entry-form (closeDialog)="onCloseDialog()" [isEditing]="isEditing"></app-entry-form>
+    <app-entry-form></app-entry-form>
 </p-dialog>

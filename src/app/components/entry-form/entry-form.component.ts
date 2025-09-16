@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from "primeng/button";
 import { Entry } from '../../pages/entries/model/entry.model';
@@ -8,6 +8,7 @@ import { NotificationType } from '../../shared/notification-type';
 import { MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
+import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 
 @Component({
   selector: 'app-entry-form',
@@ -15,10 +16,9 @@ import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
   templateUrl: './entry-form.component.html',
   styleUrl: './entry-form.component.css'
 })
-export class EntryFormComponent implements OnInit {
+export class EntryFormComponent {
   entries: Entry[] = [];
   visible: boolean = false;
-  @Output() closeDialog = new EventEmitter<void>();
   @Input() entryToEdit: any | null = null;
   @Input() isEditing: boolean = false;
   categorias: { [key: string]: string[] } = {
@@ -37,14 +37,11 @@ export class EntryFormComponent implements OnInit {
     "13": ["carro", "carros", "oficina", "oficinas", "mecanico", "mecanico", "pneu", "pneus", "manutençao carro", "manutencao carro", "manutençao do carro", "manutençao carros"]
   };
 
-
   constructor(
     private service: EntryService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private entryEvents: EntryEventsService
   ) { }
-
-  ngOnInit(): void {
-  }
 
   form = new FormGroup({
     description: new FormControl('', [Validators.required]),
@@ -61,12 +58,7 @@ export class EntryFormComponent implements OnInit {
     // Sempre recalcula a categoria a partir da descrição
     const categoriaId = this.getCategoriaIdByTerm(formValue.description!);
     const entry = new EntryRequest(formValue.description!, formValue.amount!, categoriaId);
-
-    if (this.isEditing) {
-      this.updateEntry(this.entryToEdit.id, entry);
-    } else {
-      this.createEntry(entry);
-    }
+    this.createEntry(entry);
   }
 
   private getCategoriaIdByTerm(term: string): string {
@@ -105,23 +97,9 @@ export class EntryFormComponent implements OnInit {
     return bestCategoria;
   }
 
-
   private showMessage(severity: NotificationType, summary: string, message: string) {
     this.messageService.clear();
     this.messageService.add({ severity: severity, summary: summary, detail: message });
-  }
-
-  private updateEntry(id: number, entryToUpdate: EntryRequest): void {
-    this.service.update(this.entryToEdit.id, entryToUpdate).subscribe({
-      next: () => {
-        this.showMessage(NotificationType.SUCCESS, '', 'Entrada atualizada com sucesso!');
-        this.form.reset();
-        this.closeDialog.emit(); // Fecha o diálogo
-      },
-      error: () => {
-        this.showMessage(NotificationType.ERROR, '', 'Erro ao atualizar lançamento.');
-      }
-    });
   }
 
   private createEntry(entryRequest: EntryRequest): void {
@@ -129,7 +107,8 @@ export class EntryFormComponent implements OnInit {
       next: () => {
         this.showMessage(NotificationType.SUCCESS, '', 'Entrada atualizada com sucesso!');
         this.form.reset();
-        this.closeDialog.emit(); // Fecha o diálogo
+        this.entryEvents.notifyEntryCreated();
+        this.entryEvents.setDialogState(false);
       },
       error: () => {
         this.showMessage(NotificationType.ERROR, '', 'Erro ao atualizar lançamento.');
@@ -137,21 +116,9 @@ export class EntryFormComponent implements OnInit {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['entryToEdit'] && this.entryToEdit) {
-      this.form.patchValue({
-        description: this.entryToEdit.description || '',
-        amount: this.entryToEdit.amount || ''
-      });
-    }
-    if (changes['entryToEdit'] && !this.entryToEdit) {
-      this.form.reset();
-    }
-  }
-
   onCancel() {
     this.form.reset();
-    this.closeDialog.emit();
+    this.entryEvents.setDialogState(false);
   }
 
   convertToEntryRequest(entry: Entry): EntryRequest {
@@ -161,6 +128,5 @@ export class EntryFormComponent implements OnInit {
       entry.category?.id || ''
     );
   }
-
 
 }

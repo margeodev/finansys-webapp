@@ -20,8 +20,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 export class EntryTableComponent implements OnChanges {
 
   @Input() userName: string | null = null;
-  @Input() reloadTrigger: boolean = false;
-
+  @Input() reload: boolean = false;
+  
   entries: Entry[] = [];
   isLoading: boolean = false;
   isEditing: boolean = false;
@@ -33,12 +33,9 @@ export class EntryTableComponent implements OnChanges {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['userName'] && changes['userName'].currentValue) {
-      this.loadEntries();
-    }
-
-    // Quando o gatilho de reload é ativado
-    if (changes['reloadTrigger'] && changes['reloadTrigger'].currentValue === true) {
+    const reloadChanged = !!changes['reload'];
+    // Sempre que reload mudar para true, recarrega
+    if (reloadChanged) {
       this.loadEntries();
     }
   }

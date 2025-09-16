@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { catchError, forkJoin, Observable, of } from "rxjs";
 import { DividerModule } from "primeng/divider";
 import { EntryService } from "./service/entry.service";
@@ -12,6 +12,7 @@ import { UserHeader } from "./model/user-header.model";
 import { BalanceResponse } from "./model/balance.model";
 import { EntryHeaderComponent } from "../../components/entry-header/entry-header.component";
 import { EntryTableComponent } from "../../components/entry-table/entry-table.component";
+import { EntryEventsService } from "./service/entry-event.service";
 
 @Component({
   selector: 'app-entries',
@@ -30,11 +31,20 @@ export class Entries implements OnInit {
 
   constructor(
     private userService: UserService,
-    private entryService: EntryService
+    private entryService: EntryService,
+    private entryEvents: EntryEventsService
   ) { }
 
   ngOnInit(): void {
     this.loadUsersData();
+    this.listenEntryCreatedEvent();
+  }
+
+  private listenEntryCreatedEvent() {
+    this.entryEvents.entryCreated$.subscribe(() => {
+      this.loadUsersData();
+      this.shouldReloadTable = !this.shouldReloadTable;
+    });
   }
 
   private loadUsersData(): void {
@@ -55,7 +65,7 @@ export class Entries implements OnInit {
             advance2 = advance2 / 2;
             subTotalBalanceOne = subTotalBalanceOne - advance1;
             subTotalBalanceTwo = subTotalBalanceTwo - advance2;
-            
+
             let total1 = subTotalBalanceOne + advance1 + advance2;
             let total2 = subTotalBalanceTwo + advance2 + advance1;
 
@@ -90,7 +100,7 @@ export class Entries implements OnInit {
     return (subTotalOne - subTotalTwo) / 2;
   }
 
-  getUserBalance(userName: string): Observable<BalanceResponse> {
+  private getUserBalance(userName: string): Observable<BalanceResponse> {
     return this.entryService.getUserTotal(userName).pipe(
       catchError((err) => {
         console.error('Erro ao buscar total do usuário:', err);
@@ -99,8 +109,9 @@ export class Entries implements OnInit {
     );
   }
 
-  handleDialogClose() {
-    this.shouldReloadTable = true;
+  handleCreatedEntry() {
+    this.loadUsersData();
+    this.shouldReloadTable = !this.shouldReloadTable;
   }
 
 }
