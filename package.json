@@ -19,6 +19,7 @@
     "@angular/router": "^20.3.0",
     "@primeuix/themes": "^1.2.3",
     "@tailwindcss/postcss": "^4.1.12",
+    "dotenv": "^17.2.2",
     "echarts": "^6.0.0",
     "ngx-echarts": "^20.0.2",
     "postcss": "^8.5.6",
