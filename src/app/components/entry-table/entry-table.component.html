@@ -1,4 +1,4 @@
-<p-table [value]="entries" styleClass="p-datatable-gridlines my-custom-table" showGridlines stripedRows [size]="'small'"
+<p-table [value]="entries" showGridlines stripedRows [size]="'small'"
   [paginator]="true" [rows]="15">
 
   <ng-template pTemplate="header">
@@ -17,7 +17,7 @@
 
       <td>
         <p-chip class="!py-0 !pl-0 !pr-4"
-          [ngStyle]="{ 'background-color': getCategoryColor(entry?.category?.id), 'color': '#fff' }">          
+          [ngStyle]="{ 'background-color': getCategoryColor(entry?.category?.id), 'color': '#fff' }">
           <span class="ml-3 flex items-center justify-center">
             <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
           </span>
@@ -30,10 +30,17 @@
       <td>{{ entry.amount | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</td>
 
       <td>
-        <div>
-          <p-toggleswitch [(ngModel)]="entry.advancePayment" />
-        </div>
+        <p-toggleswitch [(ngModel)]="entry.advancePayment" (onChange)="onToggleChange($event, entry)"/>
       </td>
     </tr>
   </ng-template>
 </p-table>
+
+<p-confirmdialog>
+  <ng-template #message let-message>
+    <div class="flex flex-col items-center w-full gap-4 border-b border-surface-200 dark:border-surface-700">
+      <i [ngClass]="message.icon" class="!text-6xl text-primary-500"></i>
+      <p>{{ message.message }}</p>
+    </div>
+  </ng-template>
+</p-confirmdialog>

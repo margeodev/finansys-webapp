@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { catchError, forkJoin, Observable, of } from "rxjs";
 import { DividerModule } from "primeng/divider";
 import { EntryService } from "./service/entry.service";
@@ -44,6 +44,10 @@ export class Entries implements OnInit {
     this.entryEvents.entryCreated$.subscribe(() => {
       this.loadUsersData();
       this.shouldReloadTable = !this.shouldReloadTable;
+    });
+
+    this.entryEvents.entryUpdated$.subscribe(() => {
+      this.loadUsersData();
     });
   }
 

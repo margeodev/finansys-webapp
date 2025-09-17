@@ -11,6 +11,9 @@ export class EntryEventsService {
   private dialogStateSource = new Subject<boolean>();
   dialogState$ = this.dialogStateSource.asObservable();
 
+  private entryUpdatedSource = new Subject<void>();
+  entryUpdated$ = this.entryUpdatedSource.asObservable();
+
   notifyEntryCreated(): void {
     this.entryCreatedSource.next();
   }
@@ -19,4 +22,9 @@ export class EntryEventsService {
   setDialogState(isOpen: boolean): void {
     this.dialogStateSource.next(isOpen);
   }
+
+  notifyEntryUpdated(): void {
+    this.entryUpdatedSource.next();
+  }
+  
 }

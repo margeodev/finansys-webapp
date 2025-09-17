@@ -14,36 +14,12 @@ export class EntryService {
 
   constructor(private http: HttpClient) { }
 
-  getAll(): Observable<Entry[]> {
-    return this.http.get(this.apiUrl).pipe(
-      catchError(this.handleError),
-      map(this.jsonDataToEntries)
-    );
-  }
-
-  // delete(id: number): Observable<any> {
-  //   const url = `${this.apiUrl}/${id}`;
-  //   return this.http.delete(url).pipe(
-  //     catchError(this.handleError),
-  //     map(() => null)
-  //   );
-  // }
-
   create(entry: EntryRequest): Observable<EntryRequest> {
     return this.http.post<Entry>(this.apiUrl, entry).pipe(
       catchError(this.handleError),
       map(this.jsonToEntry)
     );
   }
-
-  // getById(id: number): Observable<Entry> {
-  //   const url = `${this.apiUrl}/${id}`;
-
-  //   return this.http.get(url).pipe(
-  //     catchError(this.handleError),
-  //     map(this.jsonToEntry)
-  //   );
-  // }
 
   getByUserAndMonth(userName: string): Observable<Entry[]> {
     const url = `${this.apiUrl}/current-month`;
@@ -70,9 +46,9 @@ export class EntryService {
   }
 
 
-  update(id: number, entry: EntryRequest): Observable<Entry> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.put<Entry>(url, entry).pipe(
+  update(id: string, entry: Entry): Observable<Entry> {
+    const url = `${this.apiUrl}/${id}/advance-payment`;
+    return this.http.patch<Entry>(url, entry.advancePayment).pipe(
       catchError(this.handleError),
       map(this.jsonToEntry)
     );

@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
 import { NotificationType } from '../../shared/notification-type';
 import { Entry } from '../../pages/entries/model/entry.model';
@@ -10,10 +10,13 @@ import { ButtonModule } from 'primeng/button';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
+import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 
 @Component({
   selector: 'app-entry-table',
-  imports: [TableModule, ChipModule, CommonModule, ButtonModule, ToggleSwitchModule, FormsModule, SkeletonModule],
+  imports: [TableModule, ChipModule, CommonModule, ButtonModule, ToggleSwitchModule, FormsModule, SkeletonModule, ConfirmDialogModule, ConfirmDialog],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './entry-table.component.html',
   styleUrl: './entry-table.component.css'
 })
@@ -21,7 +24,8 @@ export class EntryTableComponent implements OnChanges {
 
   @Input() userName: string | null = null;
   @Input() reload: boolean = false;
-  
+  tempToggle: boolean = false;
+
   entries: Entry[] = [];
   isLoading: boolean = false;
   isEditing: boolean = false;
@@ -29,8 +33,49 @@ export class EntryTableComponent implements OnChanges {
 
   constructor(
     private service: EntryService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    private entryEventService: EntryEventsService
   ) { }
+
+  onToggleChange(event: any, entry: Entry): void {
+    const currentValue = entry.advancePayment;
+
+    this.confirmationService.confirm({
+      message: 'Deseja realmente alterar o pagamento antecipado?',
+      header: 'Confirmação',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.changeIsAdvancePayment(entry)
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Confirmado',
+          detail: 'Pagamento antecipado alterado',
+        });
+      },
+      reject: () => {
+        // Mantém o valor anterior
+        entry.advancePayment = !currentValue;
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Cancelado',
+          detail: 'Alteração não realizada',
+        });
+      }
+    });
+  }
+
+
+  private changeIsAdvancePayment(entry: Entry): void {
+    this.service.update(entry.id!, entry).subscribe({
+      next: () => {
+        this.entryEventService.notifyEntryUpdated();
+      },
+      error: () => {
+        console.error('[EntryTable] Erro ao atualizar entrada');
+      }
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const reloadChanged = !!changes['reload'];
@@ -43,7 +88,7 @@ export class EntryTableComponent implements OnChanges {
   private loadEntries(): void {
     this.isLoading = true;
     this.service.getByUserAndMonth(this.userName!).subscribe({
-      next: (data) => {        
+      next: (data) => {
         this.entries = data;
         this.isLoading = false;
       },
