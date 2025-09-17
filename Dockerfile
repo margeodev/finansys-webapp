@@ -8,7 +8,8 @@ RUN ng build --configuration production
 
 # Etapa 2: Servir com Nginx
 FROM nginx:stable-alpine
-COPY --from=build /app/dist/finansys-webapp /usr/share/nginx/html
+# Copiar build final (dentro de browser/) para o nginx
+COPY --from=build /app/dist/finansys-webapp/browser /usr/share/nginx/html
 
 # Copiar configuração customizada
 COPY nginx.conf /etc/nginx/conf.d/default.conf
