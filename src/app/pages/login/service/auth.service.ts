@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../config/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = '/auth'; // usa proxy.conf.js
+  private readonly API_URL = `${environment.apiUrl}/auth`;
+
   private readonly TOKEN_KEY = 'auth_token';
 
   constructor(private http: HttpClient) {}
