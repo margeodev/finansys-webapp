@@ -2,18 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { User } from '../../login/model/user.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private apiUrl: string = "/api/v1/users/list";
+  private apiUrl: string = `${environment.apiUrl}/api/v1/users/list`;
 
   constructor(private http: HttpClient) { }
 
   getAll(): Observable<User[]> {
-    return this.http.get(this.apiUrl).pipe(
+    return this.http.get<User[]>(this.apiUrl).pipe(
       catchError(this.handleError),
       map(this.jsonDataToUsers)
     );
