@@ -4,13 +4,14 @@ import { Observable, catchError, map, throwError } from 'rxjs';
 import { Entry } from '../model/entry.model';
 import { EntryRequest } from '../model/entryRequest.model';
 import { BalanceResponse } from '../model/balance.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntryService {
 
-  private apiUrl: string = "/api/v1/entries";
+  private apiUrl: string = `${environment.localApi}/v1/entries`;
 
   constructor(private http: HttpClient) { }
 
@@ -23,7 +24,7 @@ export class EntryService {
 
   getByUserAndMonth(userName: string): Observable<Entry[]> {
     const url = `${this.apiUrl}/current-month`;
-
+    
     const headers = new HttpHeaders({
       'userName': userName
     });
@@ -39,7 +40,7 @@ export class EntryService {
     const headers = new HttpHeaders({
       'userName': userName
     });
-    
+
     return this.http.get<BalanceResponse>(url, { headers }).pipe(
       catchError(this.handleError)
     );
@@ -54,8 +55,6 @@ export class EntryService {
     );
   }
 
-
-
   private jsonDataToEntries(jsonData: any[]): Entry[] {
     const categories: Entry[] = [];
     jsonData.forEach(element => categories.push(element as Entry));
@@ -69,5 +68,4 @@ export class EntryService {
   private handleError(error: any): Observable<any> {
     return throwError(error);
   }
-
 }
