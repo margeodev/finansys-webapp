@@ -9,21 +9,21 @@ import { environment } from '../../../../environments/environment';
 })
 export class AuthService {
   private readonly API_URL = `${environment.apiUrl}/auth`;
-
   private readonly TOKEN_KEY = 'auth_token';
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string) {
+  login(username: string, password: string) {
+    const basicAuth = btoa(`${username}:${password}`);
     const headers = new HttpHeaders({
-      'email': email,
-      'password': password
+      'Authorization': `Basic ${basicAuth}`
     });
 
-    return this.http.post<{ token: string }>(`${this.API_URL}/login`, {}, { headers })
+    // backend retorna apenas string (token), não objeto {token: string}
+    return this.http.post(`${this.API_URL}/login`, {}, { headers, responseType: 'text' })
       .pipe(
-        tap(response => {
-          localStorage.setItem(this.TOKEN_KEY, response.token);
+        tap(token => {
+          localStorage.setItem(this.TOKEN_KEY, token);
         })
       );
   }
@@ -41,14 +41,14 @@ export class AuthService {
     if (!token) return false;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1])); // decodifica o JWT
-      const exp = payload.exp * 1000; // exp vem em segundos
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp * 1000;
       if (Date.now() >= exp) {
-        this.logout(); // remove token expirado
+        this.logout();
         return false;
       }
       return true;
-    } catch (e) {
+    } catch {
       this.logout();
       return false;
     }
@@ -59,13 +59,10 @@ export class AuthService {
     if (!token) return null;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));      
-      return {
-        username: payload.sub
-      };
-    } catch (e) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return { username: payload.sub };
+    } catch {
       return null;
     }
   }
-
 }

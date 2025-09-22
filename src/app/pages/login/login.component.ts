@@ -17,19 +17,19 @@ import { DividerModule } from 'primeng/divider';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, 
-    FormsModule, 
-    ButtonModule, 
-    InputTextModule, 
+  imports: [CommonModule,
+    FormsModule,
+    ButtonModule,
+    InputTextModule,
     ReactiveFormsModule,
-    PasswordModule, 
+    PasswordModule,
     CheckboxModule,
     DividerModule,
     FloatLabelModule,
     ToastModule,
     CardModule
   ],
- templateUrl: './login.component.html',
+  templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
@@ -62,19 +62,20 @@ export class LoginComponent {
       return;
     }
 
-    const { email, password } = this.form.getRawValue();
+    const { email, password } = this.form.getRawValue(); // email = username
     this.loading.set(true);
+
     this.auth.login(email!, password!).subscribe({
-      next: (res) => {
+      next: () => {
         this.toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Login efetuado!' });
         this.router.navigateByUrl('/');
       },
       error: (err: Error) => {
         this.loading.set(false);
-        this.toast.add({ severity: 'error', summary: 'Ops', detail: err.message });
+        this.toast.add({ severity: 'error', summary: 'Ops', detail: 'Credenciais inválidas' });
       }
     });
-
   }
+
 
 }

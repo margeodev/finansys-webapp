@@ -11,7 +11,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class EntryService {
 
-  private apiUrl: string = `${environment.localApi}/v1/entries`;
+  private apiUrl: string = `${environment.apiUrl}/api/v1/expenses`;
 
   constructor(private http: HttpClient) { }
 
