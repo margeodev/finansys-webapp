@@ -1,14 +1,14 @@
 <div class="mt-4 mb-4">
-  <app-breadcrumb [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Entradas'}]"></app-breadcrumb>
+  <app-breadcrumb [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Lançamentos'}]"></app-breadcrumb>
 </div>
 
-<app-page-header page-title="Lista de Entradas"></app-page-header>
+<app-page-header page-title="Lançamentos" [total-expenses]="totalExpenses"></app-page-header>
 
 <p-divider />
 
 <ng-container *ngIf="userOneHeader != null; else loading">
-  <div class="flex gap-4">
-    <div class="flex flex-col" style="flex-direction: column;">
+  <div class="flex justify-between">
+    <div class="flex flex-col w-full">
       <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
       <p-divider />
       <app-entry-table [userName]="userOneHeader!.userName!" [reload]="shouldReloadTable">
@@ -17,7 +17,7 @@
 
     <p-divider layout="vertical" />
 
-    <div class="flex flex-col" style="flex-direction: column;">
+    <div class="flex flex-col w-full">
       <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
       <p-divider />
       <app-entry-table [userName]="userTwoHeader!.userName!" [reload]="shouldReloadTable">

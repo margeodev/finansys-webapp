@@ -28,6 +28,7 @@ export class Entries implements OnInit {
   userOneHeader: UserHeader | null = null;
   userTwoHeader: UserHeader | null = null;
   shouldReloadTable: boolean = false;
+  totalExpenses: number = 0;
 
   constructor(
     private userService: UserService,
@@ -60,11 +61,12 @@ export class Entries implements OnInit {
           this.getUserBalance(users[0].username!),
           this.getUserBalance(users[1].username!)
         ]).subscribe({
-          next: ([balance1, balance2]) => {
+          next: ([balance1, balance2]) => {            
             let subTotalBalanceOne = balance1.subTotalBalance ?? 0;
             let subTotalBalanceTwo = balance2.subTotalBalance ?? 0;
             let advance1 = balance1.totalAdvanceBalance ?? 0;
-            let advance2 = balance2.totalAdvanceBalance ?? 0;
+            let advance2 = balance2.totalAdvanceBalance ?? 0;            
+            this.totalExpenses = subTotalBalanceOne + subTotalBalanceTwo + (advance1 + advance2)/2;
             advance1 = advance1 / 2;
             advance2 = advance2 / 2;
             subTotalBalanceOne = subTotalBalanceOne - advance1;
