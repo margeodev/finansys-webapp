@@ -3,6 +3,7 @@ export class EntryRequest {
         public description?: string,
         public amount?: string,
         public categoryId?: string,
-        public advancePayment?: boolean
+        public advancePayment?: boolean,
+        public isPersonal?: boolean
     ) {}
 }

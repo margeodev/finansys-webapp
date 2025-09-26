@@ -18,6 +18,14 @@
     </div>
   </div>
 </div>
+
+<div class="flex items-center gap-4 mb-4">
+  <label for="amount" class="font-semibold w-24">Pessoal</label>
+  <div class="flex flex-col flex-auto">
+    <p-checkbox  [formControl]="form.controls['isPersonal']" binary="true"></p-checkbox>
+  </div>
+</div>
+
 <div class="flex justify-end gap-2">
   <p-button label="Cancel" severity="secondary" (click)="onCancel()" />
   <p-button label="Save" (click)="saveEntry()" />

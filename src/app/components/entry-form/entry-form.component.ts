@@ -9,16 +9,18 @@ import { MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
+import { Checkbox } from 'primeng/checkbox';
 
 @Component({
   selector: 'app-entry-form',
-  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule],
+  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule, Checkbox ],
   templateUrl: './entry-form.component.html',
   styleUrl: './entry-form.component.css'
 })
 export class EntryFormComponent {
   entries: Entry[] = [];
   visible: boolean = false;
+  isPersonal: boolean = false;
   @Input() entryToEdit: any | null = null;
   @Input() isEditing: boolean = false;
   categorias: { [key: string]: string[] } = {
@@ -45,7 +47,8 @@ export class EntryFormComponent {
 
   form = new FormGroup({
     description: new FormControl('', [Validators.required]),
-    amount: new FormControl('', [Validators.required])
+    amount: new FormControl('', [Validators.required]),
+    isPersonal: new FormControl(false)
   });
 
   saveEntry(): void {
@@ -53,11 +56,11 @@ export class EntryFormComponent {
       this.form.markAllAsTouched(); // força exibir mensagens de erro
       return;
     }
-    const formValue = this.form.value;
+    const formValue = this.form.value;    
 
     // Sempre recalcula a categoria a partir da descrição
     const categoriaId = this.getCategoriaIdByTerm(formValue.description!);
-    const entry = new EntryRequest(formValue.description!, formValue.amount!, categoriaId);
+    const entry = new EntryRequest(formValue.description!, formValue.amount!, categoriaId, false, formValue.isPersonal!);
     this.createEntry(entry);
   }
 
@@ -102,16 +105,16 @@ export class EntryFormComponent {
     this.messageService.add({ severity: severity, summary: summary, detail: message });
   }
 
-  private createEntry(entryRequest: EntryRequest): void {
+  private createEntry(entryRequest: EntryRequest): void {    
     this.service.create(entryRequest).subscribe({
       next: () => {
-        this.showMessage(NotificationType.SUCCESS, '', 'Entrada atualizada com sucesso!');
+        this.showMessage(NotificationType.SUCCESS, '', 'Registro incluido com sucesso!');
         this.form.reset();
         this.entryEvents.notifyEntryCreated();
         this.entryEvents.setDialogState(false);
       },
       error: () => {
-        this.showMessage(NotificationType.ERROR, '', 'Erro ao atualizar lançamento.');
+        this.showMessage(NotificationType.ERROR, '', 'Erro ao incluir registro.');
       }
     });
   }
