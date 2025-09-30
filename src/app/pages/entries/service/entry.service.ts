@@ -23,7 +23,7 @@ export class EntryService {
   }
 
   getByUserAndMonth(userName: string): Observable<Entry[]> {
-    const url = `${this.apiUrl}/current-month`;
+    const url = `${this.apiUrl}/period`;
     
     const headers = new HttpHeaders({
       'userName': userName
