@@ -1,8 +1,31 @@
 <div class="mt-4 mb-4">
-  <app-breadcrumb [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Lançamentos'}]"></app-breadcrumb>
+  <app-breadcrumb
+    [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Lançamentos'}]">
+  </app-breadcrumb>
 </div>
 
-<app-page-header page-title="Lançamentos" [total-expenses]="totalExpenses"></app-page-header>
+<app-page-header page-title="Lançamentos" [total-expenses]="totalExpenses">
+</app-page-header>
+
+<div class="flex gap-2 align-items-center">
+  <p-datePicker
+    view="month"
+    displayFormat="MM/yyyy"
+    inputFormat="MM/yyyy"
+    [(ngModel)]="mesAnoSelecionado"
+    [showIcon]="true"
+    [minDate]="minDate"
+    [maxDate]="maxDate"
+    placeholder="Selecione mês e ano">
+  </p-datePicker>
+
+  <p-button
+    label="Pesquisar"
+    icon="pi pi-search"
+    [loading]="isLoading"
+    (onClick)="load()"
+    severity="warn"/>
+</div>
 
 <p-divider />
 
@@ -11,8 +34,26 @@
     <div class="flex flex-col w-full">
       <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
       <p-divider />
-      <app-entry-table [userName]="userOneHeader!.userName!" [reload]="shouldReloadTable">
-      </app-entry-table>
+      <p-tabs value="0">
+        <p-tablist>
+          <p-tab value="0">Compartilhadas</p-tab>
+          <p-tab value="1">Pessoal</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="0">
+            <app-entry-table
+              [userName]="userOneHeader!.userName!"
+              [dateParam]="dateParam"
+              [reload]="shouldReloadTable">
+            </app-entry-table>
+          </p-tabpanel>
+
+          <p-tabpanel value="1">
+            <h1>teste</h1>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
 
     <p-divider layout="vertical" />
@@ -20,15 +61,37 @@
     <div class="flex flex-col w-full">
       <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
       <p-divider />
-      <app-entry-table [userName]="userTwoHeader!.userName!" [reload]="shouldReloadTable">
-      </app-entry-table>
+
+      <p-tabs value="0">
+        <p-tablist>
+          <p-tab value="0">Compartilhadas</p-tab>
+          <p-tab value="1">Pessoal</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="0">
+            <app-entry-table
+              [userName]="userTwoHeader!.userName!"
+              [dateParam]="dateParam"
+              [reload]="shouldReloadTable">
+            </app-entry-table>
+          </p-tabpanel>
+
+          <p-tabpanel value="1">
+            <h1>teste</h1>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </div>
 </ng-container>
 
 <ng-template #loading>
   <div class="flex flex-col items-center justify-center h-64">
-    <p-progressSpinner styleClass="custom-spinner" strokeWidth="4" animationDuration=".5s"
+    <p-progressSpinner
+      styleClass="custom-spinner"
+      strokeWidth="4"
+      animationDuration=".5s"
       [style]="{width: '50px', height: '50px'}">
     </p-progressSpinner>
     <p class="mt-4 text-gray-500">Carregando...</p>

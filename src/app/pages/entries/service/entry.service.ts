@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+import { BalanceResponse } from '../model/balance.model';
 import { Entry } from '../model/entry.model';
 import { EntryRequest } from '../model/entryRequest.model';
-import { BalanceResponse } from '../model/balance.model';
-import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntryService {
-
   private apiUrl: string = `${environment.apiUrl}/api/v1/expenses`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   create(entry: EntryRequest): Observable<EntryRequest> {
     return this.http.post<Entry>(this.apiUrl, entry).pipe(
@@ -22,30 +22,36 @@ export class EntryService {
     );
   }
 
-  getByUserAndMonth(userName: string): Observable<Entry[]> {
+  getByUserAndMonth(userName: string, date?: string): Observable<Entry[]> {
     const url = `${this.apiUrl}/period`;
-    
-    const headers = new HttpHeaders({
-      'userName': userName
-    });
 
-    return this.http.get<Entry[]>(url, { headers }).pipe(
+    let params = new HttpParams();
+    if (date) {
+      params = params.set('date', date);
+    }
+
+    const headers = new HttpHeaders({ 'userName': userName });
+
+    return this.http.get<Entry[]>(url, { headers, params }).pipe(
       catchError(this.handleError),
       map(this.jsonDataToEntries)
     );
   }
 
-  getUserTotal(userName: string): Observable<BalanceResponse> {
+  getUserTotal(userName: string, date?: string): Observable<BalanceResponse> {
     const url = `${this.apiUrl}/total`;
-    const headers = new HttpHeaders({
-      'userName': userName
-    });
 
-    return this.http.get<BalanceResponse>(url, { headers }).pipe(
+    let params = new HttpParams();
+    if (date) {
+      params = params.set('date', date);
+    }
+
+    const headers = new HttpHeaders({ 'userName': userName });
+
+    return this.http.get<BalanceResponse>(url, { headers, params }).pipe(
       catchError(this.handleError)
     );
   }
-
 
   update(id: string, entry: Entry): Observable<Entry> {
     const url = `${this.apiUrl}/${id}/advance-payment`;

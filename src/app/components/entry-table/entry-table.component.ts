@@ -15,28 +15,60 @@ import { EntryEventsService } from '../../pages/entries/service/entry-event.serv
 
 @Component({
   selector: 'app-entry-table',
-  imports: [TableModule, ChipModule, CommonModule, ButtonModule, ToggleSwitchModule, FormsModule, SkeletonModule, ConfirmDialogModule, ConfirmDialog],
+  imports: [
+    TableModule,
+    ChipModule,
+    CommonModule,
+    ButtonModule,
+    ToggleSwitchModule,
+    FormsModule,
+    SkeletonModule,
+    ConfirmDialogModule,
+    ConfirmDialog
+  ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './entry-table.component.html',
   styleUrl: './entry-table.component.css'
 })
 export class EntryTableComponent implements OnChanges {
-
   @Input() userName: string | null = null;
+  @Input() dateParam: string | null = null; // 🔥 recebe a data do pai
   @Input() reload: boolean = false;
-  tempToggle: boolean = false;
 
   entries: Entry[] = [];
   isLoading: boolean = false;
   isEditing: boolean = false;
-  visible: boolean = false
+  visible: boolean = false;
 
   constructor(
     private service: EntryService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private entryEventService: EntryEventsService
-  ) { }
+  ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const reloadChanged = !!changes['reload'];
+    if (reloadChanged) {
+      this.loadEntries();
+    }
+  }
+
+  private loadEntries(): void {
+    if (!this.userName) return;
+
+    this.isLoading = true;
+    this.service.getByUserAndMonth(this.userName, this.dateParam ?? undefined).subscribe({
+      next: (data) => {
+        this.entries = data;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.showMessage(NotificationType.ERROR, '', 'Erro ao carregar lançamentos');
+      }
+    });
+  }
 
   onToggleChange(event: any, entry: Entry): void {
     const currentValue = entry.advancePayment;
@@ -46,25 +78,23 @@ export class EntryTableComponent implements OnChanges {
       header: 'Confirmação',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.changeIsAdvancePayment(entry)
+        this.changeIsAdvancePayment(entry);
         this.messageService.add({
           severity: 'info',
           summary: 'Confirmado',
-          detail: 'Pagamento antecipado alterado',
+          detail: 'Pagamento antecipado alterado'
         });
       },
       reject: () => {
-        // Mantém o valor anterior
         entry.advancePayment = !currentValue;
         this.messageService.add({
           severity: 'warn',
           summary: 'Cancelado',
-          detail: 'Alteração não realizada',
+          detail: 'Alteração não realizada'
         });
       }
     });
   }
-
 
   private changeIsAdvancePayment(entry: Entry): void {
     this.service.update(entry.id!, entry).subscribe({
@@ -73,28 +103,6 @@ export class EntryTableComponent implements OnChanges {
       },
       error: () => {
         console.error('[EntryTable] Erro ao atualizar entrada');
-      }
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const reloadChanged = !!changes['reload'];
-    // Sempre que reload mudar para true, recarrega
-    if (reloadChanged) {
-      this.loadEntries();
-    }
-  }
-
-  private loadEntries(): void {
-    this.isLoading = true;
-    this.service.getByUserAndMonth(this.userName!).subscribe({
-      next: (data) => {
-        this.entries = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.showMessage(NotificationType.ERROR, '', 'Erro ao carregar lançamentos');
       }
     });
   }
@@ -111,19 +119,19 @@ export class EntryTableComponent implements OnChanges {
 
   getCategoryIcon(categoryId: string): any {
     const iconsMap: { [key: string]: string } = {
-      '1': 'house',                         // Moradia
-      '2': 'cart-shopping',                 // Supermercado
-      '3': 'lightbulb-dollar',              // Conta Consumo
-      '4': 'gas-pump',                      // Transporte
-      '5': 'joystick',                      // Lazer
-      '6': 'stethoscope',                   // Saúde
-      '7': 'fork-knife',                    // Bares e Restaurantes
-      '8': 'screwdriver-wrench',            // Manutenção Casa
-      '9': 'croissant',                     // Padaria
-      '10': 'prescription-bottle-medical',  // Farmácia
-      '11': 'list',                         // Outros
-      '12': 'cat',                          // Pets
-      '13': 'car-wrench'                    // Manutenção Carro
+      '1': 'house',
+      '2': 'cart-shopping',
+      '3': 'lightbulb-dollar',
+      '4': 'gas-pump',
+      '5': 'joystick',
+      '6': 'stethoscope',
+      '7': 'fork-knife',
+      '8': 'screwdriver-wrench',
+      '9': 'croissant',
+      '10': 'prescription-bottle-medical',
+      '11': 'list',
+      '12': 'cat',
+      '13': 'car-wrench'
     };
     return iconsMap[categoryId] || 'list';
   }
@@ -145,8 +153,7 @@ export class EntryTableComponent implements OnChanges {
       13: '--color-lime'
     };
 
-    const variableName = colorMap[categoryId] || '--color-blue'; // fallback
+    const variableName = colorMap[categoryId] || '--color-blue';
     return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
   }
-
 }
