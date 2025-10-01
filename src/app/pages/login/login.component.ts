@@ -62,20 +62,21 @@ export class LoginComponent {
       return;
     }
 
-    const { email, password } = this.form.getRawValue(); // email = username
+    const { email, password, remember } = this.form.getRawValue();
     this.loading.set(true);
 
-    this.auth.login(email!, password!).subscribe({
+    this.auth.login(email!, password!, remember!).subscribe({
       next: () => {
         this.toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Login efetuado!' });
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl('/entries');
       },
-      error: (err: Error) => {
+      error: () => {
         this.loading.set(false);
         this.toast.add({ severity: 'error', summary: 'Ops', detail: 'Credenciais inválidas' });
       }
     });
   }
+
 
 
 }

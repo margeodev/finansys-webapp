@@ -1,13 +1,12 @@
 <div class="min-h-screen flex align-items-center justify-content-center">
   <div class="w-full md:w-5 lg:w-4 xl:w-3">
     <p-card class="shadow-3 border-round-2xl" [style]="{overflow:'hidden'}">
-      
+
       <!-- Cabeçalho -->
       <ng-template pTemplate="header">
         <div class="flex align-items-center justify-content-between p-3">
           <div>
-            <div class="text-xl font-bold">Bem-vindo</div>
-            <div class="text-600 text-sm">Entre para continuar</div>
+            <div class="text-xl font-bold">Login</div>
           </div>
           <i class="pi pi-shield text-500 text-2xl"></i>
         </div>
@@ -29,8 +28,8 @@
         <div class="mb-2">
           <p-floatLabel>
             <label for="password">Senha</label>
-            <p-password formControlName="password" [toggleMask]="true" [feedback]="false"
-                        inputId="password" class="w-full" [inputStyle]="{width:'100%'}">
+            <p-password formControlName="password" [toggleMask]="true" [feedback]="false" inputId="password"
+              class="w-full" [inputStyle]="{width:'100%'}">
             </p-password>
             <small class="p-error" *ngIf="passwordInvalid">
               Senha obrigatória (mín. 6 caracteres).
@@ -41,16 +40,16 @@
         <!-- Lembrar + Esqueci -->
         <div class="flex align-items-center justify-content-between mb-3">
           <div class="flex align-items-center gap-2">
-            <p-checkbox inputId="remember" formControlName="remember"></p-checkbox>
-            <label for="remember" class="text-sm">Lembrar-me</label>
-          </div>         
+            <p-checkbox inputId="remember" formControlName="remember" binary="true">
+            </p-checkbox>
+            <label for="remember" class="text-sm cursor-pointer">Lembrar-me</label>
+          </div>
+
         </div>
 
         <!-- Botão Login -->
-        <button pButton type="submit" label="Entrar"
-                class="w-full p-button-rounded"
-                [loading]="loading()"
-                [disabled]="form.invalid || loading()"></button>
+        <button pButton type="submit" label="Entrar" class="w-full p-button-rounded" [loading]="loading()"
+          [disabled]="form.invalid || loading()"></button>
       </form>
     </p-card>
   </div>

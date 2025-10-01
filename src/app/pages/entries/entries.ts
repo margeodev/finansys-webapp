@@ -92,7 +92,7 @@ export class Entries implements OnInit {
 
   private handleDate() {
     const hoje = new Date();
-    this.minDate = new Date(2025, 7, 1);
+    this.minDate = new Date(2025, 8, 1);
     this.maxDate = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
   }
 

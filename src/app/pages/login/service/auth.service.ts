@@ -11,29 +11,33 @@ export class AuthService {
   private readonly API_URL = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'auth_token';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  login(username: string, password: string) {
+  login(username: string, password: string, remember: boolean) {
     const basicAuth = btoa(`${username}:${password}`);
     const headers = new HttpHeaders({
       'Authorization': `Basic ${basicAuth}`
     });
 
-    // backend retorna apenas string (token), não objeto {token: string}
     return this.http.post(`${this.API_URL}/login`, {}, { headers, responseType: 'text' })
       .pipe(
         tap(token => {
-          localStorage.setItem(this.TOKEN_KEY, token);
+          if (remember) {
+            localStorage.setItem(this.TOKEN_KEY, token);
+          } else {
+            sessionStorage.setItem(this.TOKEN_KEY, token);
+          }
         })
       );
   }
 
   logout() {
     localStorage.removeItem(this.TOKEN_KEY);
+    sessionStorage.removeItem(this.TOKEN_KEY);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return localStorage.getItem(this.TOKEN_KEY) || sessionStorage.getItem(this.TOKEN_KEY);
   }
 
   isAuthenticated(): boolean {

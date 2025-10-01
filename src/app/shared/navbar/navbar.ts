@@ -1,15 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
+import { AuthService } from '../../pages/login/service/auth.service';
+import { Button } from 'primeng/button';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MenubarModule],
+  imports: [MenubarModule, Button],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class Navbar {
   items: MenuItem[] | undefined;
+
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   ngOnInit() {
       this.items = [
@@ -30,6 +36,11 @@ export class Navbar {
               routerLink:"/categories"
           }
       ];
+  }
+
+  logout() {
+    this.auth.logout();
+    this.router.navigateByUrl('/login');
   }
 
 }

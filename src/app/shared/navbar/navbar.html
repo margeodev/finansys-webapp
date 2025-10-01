@@ -1,1 +1,5 @@
-<p-menubar [model]="items"></p-menubar>
+<p-menubar [model]="items">
+    <ng-template pTemplate="end">
+        <p-button label="Sair" icon="pi pi-sign-out" (onClick)="logout()" severity="secondary" />
+    </ng-template>
+</p-menubar>
