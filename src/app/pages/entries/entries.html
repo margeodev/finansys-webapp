@@ -50,7 +50,12 @@
           </p-tabpanel>
 
           <p-tabpanel value="1">
-            <h1>teste</h1>
+            <app-entry-table
+              [userName]="userOneHeader!.userName!"
+              [dateParam]="dateParam"
+              [reload]="shouldReloadTable"
+              [isPersonal]="true">
+            </app-entry-table>
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>
@@ -78,7 +83,12 @@
           </p-tabpanel>
 
           <p-tabpanel value="1">
-            <h1>teste</h1>
+            <app-entry-table
+              [userName]="userTwoHeader!.userName!"
+              [dateParam]="dateParam"
+              [reload]="shouldReloadTable"
+              [isPersonal]="true">
+            </app-entry-table>
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>

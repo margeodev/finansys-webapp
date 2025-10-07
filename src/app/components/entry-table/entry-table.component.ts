@@ -34,6 +34,7 @@ export class EntryTableComponent implements OnChanges {
   @Input() userName: string | null = null;
   @Input() dateParam: string | null = null; // 🔥 recebe a data do pai
   @Input() reload: boolean = false;
+  @Input() isPersonal: boolean = false; // 🔥 novo input para isPersonal
 
   entries: Entry[] = [];
   isLoading: boolean = false;
@@ -58,7 +59,8 @@ export class EntryTableComponent implements OnChanges {
     if (!this.userName) return;
 
     this.isLoading = true;
-    this.service.getByUserAndMonth(this.userName, this.dateParam ?? undefined).subscribe({
+    // 👇 ALTERAÇÃO AQUI: Passando o valor de 'isPersonal' para o serviço
+    this.service.getByUserAndMonth(this.userName, this.dateParam ?? undefined, this.isPersonal).subscribe({
       next: (data) => {
         this.entries = data;
         this.isLoading = false;

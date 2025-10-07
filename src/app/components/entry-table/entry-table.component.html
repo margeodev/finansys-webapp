@@ -30,7 +30,9 @@
       <td>{{ entry.amount | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</td>
 
       <td>
-        <p-toggleswitch [(ngModel)]="entry.advancePayment" (onChange)="onToggleChange($event, entry)"/>
+        <p-toggleswitch [(ngModel)]="entry.advancePayment" 
+                        (onChange)="onToggleChange($event, entry)" 
+                        [disabled]="isPersonal"/>
       </td>
     </tr>
   </ng-template>

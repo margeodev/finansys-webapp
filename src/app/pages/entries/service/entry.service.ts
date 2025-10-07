@@ -22,13 +22,16 @@ export class EntryService {
     );
   }
 
-  getByUserAndMonth(userName: string, date?: string): Observable<Entry[]> {
+  // 👇 ALTERAÇÃO AQUI: Adicionado o parâmetro 'isPersonal'
+  getByUserAndMonth(userName: string, date?: string, isPersonal: boolean = false): Observable<Entry[]> {
     const url = `${this.apiUrl}/period`;
 
     let params = new HttpParams();
     if (date) {
       params = params.set('date', date);
     }
+    // Adiciona o novo parâmetro na requisição
+    params = params.set('isPersonal', isPersonal.toString());
 
     const headers = new HttpHeaders({ 'userName': userName });
 
