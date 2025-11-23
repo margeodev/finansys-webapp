@@ -12,7 +12,16 @@
 <div class="flex items-center gap-4 mb-4">
   <label for="amount" class="font-semibold w-24">Valor</label>
   <div class="flex flex-col flex-auto">
-    <input pInputText [formControl]="form.controls['amount']" inputId="amount" class="flex-auto" autocomplete="off" />
+    <p-inputNumber 
+        mode="currency" 
+        currency="BRL" 
+        locale="pt-BR" 
+        [formControl]="form.controls['amount']"
+        inputId="amount"
+        autocomplete="off"
+        class="flex-auto">
+    </p-inputNumber>
+
     <div *ngIf="form.controls['amount'].invalid && form.controls['amount'].touched" class="text-red-500 text-sm">
       O valor é obrigatório
     </div>

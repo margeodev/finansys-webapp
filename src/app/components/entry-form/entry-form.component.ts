@@ -10,10 +10,11 @@ import { EntryService } from '../../pages/entries/service/entry.service';
 import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 import { Checkbox } from 'primeng/checkbox';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 @Component({
   selector: 'app-entry-form',
-  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule, Checkbox ],
+  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule, Checkbox, InputNumberModule ],
   templateUrl: './entry-form.component.html',
   styleUrl: './entry-form.component.css'
 })
@@ -47,7 +48,7 @@ export class EntryFormComponent {
 
   form = new FormGroup({
     description: new FormControl('', [Validators.required]),
-    amount: new FormControl('', [Validators.required]),
+    amount: new FormControl(null, [Validators.required]),
     isPersonal: new FormControl(false)
   });
 
