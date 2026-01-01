@@ -13,6 +13,7 @@ import { BalanceResponse } from "./model/balance.model";
 import { EntryHeaderComponent } from "../../components/entry-header/entry-header.component";
 import { EntryTableComponent } from "../../components/entry-table/entry-table.component";
 import { EntryEventsService } from "./service/entry-event.service";
+import { SelectedMonthService } from "../../shared/service/selected-month.service";
 import { Button } from "primeng/button";
 import { DatePickerModule } from "primeng/datepicker";
 import { TabsModule } from "primeng/tabs";
@@ -55,7 +56,8 @@ export class Entries implements OnInit {
   constructor(
     private userService: UserService,
     private entryService: EntryService,
-    private entryEvents: EntryEventsService
+    private entryEvents: EntryEventsService,
+    private selectedMonthService: SelectedMonthService
   ) {}
 
   ngOnInit(): void {
@@ -82,6 +84,9 @@ export class Entries implements OnInit {
     this.dateParam = dataFormatada.toISOString().split('T')[0];
     console.log('Consultando período:', this.dateParam);
 
+    // atualiza seleção compartilhada de mês (yyyy-MM-01)
+    this.selectedMonthService.setSelectedMonth(dataFormatada);
+
     this.loadUsersData(this.dateParam);
 
     setTimeout(() => {
@@ -94,6 +99,10 @@ export class Entries implements OnInit {
     const hoje = new Date();
     this.minDate = new Date(2025, 8, 1);
     this.maxDate = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+
+    // seleciona por padrão o mês atual e propaga para o serviço
+    this.mesAnoSelecionado = this.maxDate;
+    this.selectedMonthService.setSelectedMonth(this.maxDate);
   }
 
   private listenEntryCreatedEvent() {

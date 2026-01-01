@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import { Subscription } from 'rxjs';
 import * as echarts from 'echarts/core';
 import { PieChart } from 'echarts/charts';
 import {
@@ -9,6 +10,9 @@ import {
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { ReportService } from './service/report.service';
+import { SelectedMonthService } from '../../shared/service/selected-month.service';
+import { DatePickerModule } from 'primeng/datepicker';
+import { FormsModule } from '@angular/forms';
 import { PageHeader } from "../../shared/page-header/page-header";
 import { Card } from "primeng/card";
 import { CustomBreadcrumb } from "../../shared/breadcrumb/custom-breadcrumb";
@@ -25,12 +29,12 @@ echarts.use([
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [NgxEchartsDirective, PageHeader, Card, CustomBreadcrumb],
+  imports: [NgxEchartsDirective, PageHeader, Card, CustomBreadcrumb, DatePickerModule, FormsModule],
   providers: [provideEchartsCore({ echarts })],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css']
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent implements OnInit, OnDestroy {
 
   chartData: any[] = [];
   chartOptions: any;
@@ -42,21 +46,43 @@ export class ReportsComponent implements OnInit {
     '--color-teal', '--color-lime'
   ];
 
-  constructor(private reportService: ReportService) { }
+  mesAnoSelecionado: Date | null = null;
+  private selectedMonthSub?: Subscription;
+
+  constructor(private reportService: ReportService, private selectedMonthService: SelectedMonthService) { }
 
   ngOnInit(): void {
-    this.getReport();
+    // subscribe to shared selected month (set by Entries or Reports' own picker)
+    this.selectedMonthSub = this.selectedMonthService.selectedMonth$.subscribe(date => {
+      if (date) {
+        this.mesAnoSelecionado = date;
+        const now = new Date();
+        const monthsBack = (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+        this.getReport(monthsBack);
+      } else {
+        this.getReport(0);
+      }
+    });
   }
 
   getReport(monthsBack: number = 0): void {
     this.reportService.getByMonth(monthsBack.toString()).subscribe({
       next: (data) => {
-        const chartData = data.map((r: any) => ({
-          value: Number(r.total),
-          name: r.categoryDescription
+        // Agrega resultados por categoria para evitar duplicação caso a API retorne
+        // múltiplas linhas com a mesma categoria (ex.: por meses ou subgrupos)
+        const aggregated: Record<string, number> = data.reduce((acc: Record<string, number>, r: any) => {
+          const name = r.categoryDescription ?? 'Sem categoria';
+          const value = Number(r.total) || 0;
+          acc[name] = (acc[name] ?? 0) + value;
+          return acc;
+        }, {});
+
+        const chartData = Object.entries(aggregated).map(([name, value]) => ({
+          value,
+          name
         }));
 
-        const colors = data.map((_: any, i: number) =>
+        const colors = chartData.map((_: any, i: number) =>
           this.getCssVariable(this.colorList[i % this.colorList.length])
         );
 
@@ -127,7 +153,16 @@ export class ReportsComponent implements OnInit {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
+  onReportDateChange(date: Date | null): void {
+    // quando o usuário altera a data na tela de Relatórios, propaga para o serviço
+    this.selectedMonthService.setSelectedMonth(date);
+  }
+
   onSelect(event: any): void {
     console.log('Selecionado:', event);
+  }
+
+  ngOnDestroy(): void {
+    this.selectedMonthSub?.unsubscribe();
   }
 }

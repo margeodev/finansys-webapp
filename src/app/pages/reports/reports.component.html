@@ -4,6 +4,18 @@
 
 <app-page-header page-title="Relatórios"></app-page-header>
 
+<div class="flex gap-2 align-items-center mb-4">
+  <p-datePicker
+    view="month"
+    displayFormat="MM/yyyy"
+    inputFormat="MM/yyyy"
+    [(ngModel)]="mesAnoSelecionado"
+    (ngModelChange)="onReportDateChange($event)"
+    [showIcon]="true"
+    placeholder="Selecione mês e ano">
+  </p-datePicker>
+</div>
+
 <div>
   <p-card>
     <div class="chart-container">
