@@ -13,7 +13,7 @@
 
   <ng-template pTemplate="body" let-entry>
     <tr>
-      <td>{{ entry.description }}</td>
+      <td title="{{ entry.description }}">{{ entry.description | truncate: 20 }}</td>
 
       <td>
         <p-chip class="!py-0 !pl-0 !pr-4"

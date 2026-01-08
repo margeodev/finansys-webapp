@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
+import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 
 @Component({
   selector: 'app-entry-table',
@@ -24,7 +25,8 @@ import { EntryEventsService } from '../../pages/entries/service/entry-event.serv
     FormsModule,
     SkeletonModule,
     ConfirmDialogModule,
-    ConfirmDialog
+    ConfirmDialog,
+    TruncatePipe
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './entry-table.component.html',
