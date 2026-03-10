@@ -34,6 +34,7 @@ import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 })
 export class EntryTableComponent implements OnChanges {
   @Input() userName: string | null = null;
+  @Input() userId: number | null = null;
   @Input() dateParam: string | null = null; // 🔥 recebe a data do pai
   @Input() reload: boolean = false;
   @Input() isPersonal: boolean = false; // 🔥 novo input para isPersonal
@@ -58,11 +59,10 @@ export class EntryTableComponent implements OnChanges {
   }
 
   private loadEntries(): void {
-    if (!this.userName) return;
+    if (!this.userId) return;
 
     this.isLoading = true;
-    // 👇 ALTERAÇÃO AQUI: Passando o valor de 'isPersonal' para o serviço
-    this.service.getByUserAndMonth(this.userName, this.dateParam ?? undefined, this.isPersonal).subscribe({
+    this.service.getByUserAndMonth(this.userId, this.dateParam ?? undefined, this.isPersonal).subscribe({
       next: (data) => {
         this.entries = data;
         this.isLoading = false;

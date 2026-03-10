@@ -124,8 +124,8 @@ export class Entries implements OnInit {
         this.users = users;
 
         forkJoin([
-          this.getUserBalance(users[0].username!, dateParam),
-          this.getUserBalance(users[1].username!, dateParam)
+          this.getUserBalance(users[0].id!, dateParam),
+          this.getUserBalance(users[1].id!, dateParam)
         ]).subscribe({
           next: ([balance1, balance2]) => {
             let subTotalBalanceOne = balance1.subTotalBalance ?? 0;
@@ -152,6 +152,7 @@ export class Entries implements OnInit {
             let saldo2: number = -saldo1;
 
             this.userOneHeader = new UserHeader(
+              users[0].id!,
               users[0].username!,
               total1,
               advance1,
@@ -159,6 +160,7 @@ export class Entries implements OnInit {
             );
 
             this.userTwoHeader = new UserHeader(
+              users[1].id!,
               users[1].username!,
               total2,
               advance2,
@@ -183,10 +185,10 @@ export class Entries implements OnInit {
   }
 
   private getUserBalance(
-    userName: string,
+    userId: number,
     dateParam?: string
   ): Observable<BalanceResponse> {
-    return this.entryService.getUserTotal(userName, dateParam).pipe(
+    return this.entryService.getUserTotal(userId, dateParam).pipe(
       catchError((err) => {
         console.error('Erro ao buscar total do usuário:', err);
         return of(new BalanceResponse(0, 0));

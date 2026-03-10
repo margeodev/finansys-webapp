@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080',
+  // Backend Node (produção Firebase Functions)
+  apiUrl: 'https://us-central1-finansys-567c9.cloudfunctions.net',
   localApi: '/api'
 };

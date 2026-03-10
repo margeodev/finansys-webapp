@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://finansys-api-7wt7uq.fly.dev',
-  localApi: 'https://finansys-api-7wt7uq.fly.dev'
+  // Backend Node (Firebase Functions)
+  apiUrl: 'https://us-central1-finansys-567c9.cloudfunctions.net',
+  localApi: '/api'
 };

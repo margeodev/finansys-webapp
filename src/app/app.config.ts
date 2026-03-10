@@ -11,19 +11,19 @@ import { authInterceptor } from './pages/login/interceptor/auth.interceptor'; //
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }), 
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     MessageService,
     ConfirmationService,
     provideHttpClient(
       withInterceptors([authInterceptor]) // 🔹 função, não classe
     ),
-    provideAnimationsAsync(),  
-            providePrimeNG({
-              inputVariant: 'filled' ,
-              theme: {
-                  preset: Aura
-              }
-        })   
+    provideAnimationsAsync(),
+    providePrimeNG({
+      inputVariant: 'filled',
+      theme: {
+        preset: Aura
+      }
+    })
   ]
 };

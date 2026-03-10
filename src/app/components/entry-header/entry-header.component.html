@@ -32,5 +32,5 @@
 </p-card>
 
 <p-dialog header="Nova Despesa" [modal]="true" [(visible)]="visible" class="dialog-box">
-  <app-entry-form></app-entry-form>
+  <app-entry-form [userId]="userHeader?.id"></app-entry-form>
 </p-dialog>

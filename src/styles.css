@@ -5,7 +5,7 @@ body {
   background-color: rgb(240, 240, 240);
 }
 
-:root {
+::root {
   /* Cores do gráfico de despesas */
   --color-blue: #42A5F5;
   --color-green: #66BB6A;
@@ -26,14 +26,12 @@ body {
   --grid-color: #ebedef;
 }
 
-
 .container {
   padding-right: 20px;
   padding-left: 20px;
   margin-right: auto;
   margin-left: auto;
 }
-
 
 @media (min-width: 768px) {
   .container {
@@ -52,3 +50,4 @@ body {
     width: 1280px;
   }
 }
+

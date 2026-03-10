@@ -44,6 +44,7 @@
           <p-tabpanel value="0">
             <app-entry-table
               [userName]="userOneHeader!.userName!"
+              [userId]="users[0]?.id ?? null"
               [dateParam]="dateParam"
               [reload]="shouldReloadTable">
             </app-entry-table>
@@ -52,6 +53,7 @@
           <p-tabpanel value="1">
             <app-entry-table
               [userName]="userOneHeader!.userName!"
+              [userId]="users[0]?.id ?? null"
               [dateParam]="dateParam"
               [reload]="shouldReloadTable"
               [isPersonal]="true">
@@ -77,6 +79,7 @@
           <p-tabpanel value="0">
             <app-entry-table
               [userName]="userTwoHeader!.userName!"
+              [userId]="users[1]?.id ?? null"
               [dateParam]="dateParam"
               [reload]="shouldReloadTable">
             </app-entry-table>
@@ -85,6 +88,7 @@
           <p-tabpanel value="1">
             <app-entry-table
               [userName]="userTwoHeader!.userName!"
+              [userId]="users[1]?.id ?? null"
               [dateParam]="dateParam"
               [reload]="shouldReloadTable"
               [isPersonal]="true">

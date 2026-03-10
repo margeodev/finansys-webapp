@@ -24,6 +24,7 @@ export class EntryFormComponent {
   isPersonal: boolean = false;
   @Input() entryToEdit: any | null = null;
   @Input() isEditing: boolean = false;
+  @Input() userId: number | null | undefined = null;
   categorias: { [key: string]: string[] } = {
     "1": ["aluguel", "alugueis", "condominio", "iptu", "casa", "casas", "moradia", "terreno"],
     "2": ["mercado", "mercados", "supermercado", "supermercados", "compra", "compras"],
@@ -61,7 +62,14 @@ export class EntryFormComponent {
 
     // Sempre recalcula a categoria a partir da descrição
     const categoriaId = this.getCategoriaIdByTerm(formValue.description!);
-    const entry = new EntryRequest(formValue.description!, formValue.amount!, categoriaId, false, formValue.isPersonal!);
+    const entry = new EntryRequest(
+      formValue.description!,
+      formValue.amount!,
+      categoriaId,
+      false,
+      formValue.isPersonal!,
+      this.userId ?? undefined
+    );
     this.createEntry(entry);
   }
 
