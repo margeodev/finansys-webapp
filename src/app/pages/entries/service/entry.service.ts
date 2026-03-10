@@ -94,6 +94,7 @@ export class EntryService {
         description: element.description,
         amount: String(element.amount),
         advancePayment: element.isAdvancePayment,
+        isPersonal: element.isPersonal,
         category: { id: element.categoryId, description: element.categoryDescription }
       } as Entry;
       (e as any).date = element.date;
@@ -108,6 +109,7 @@ export class EntryService {
       description: jsonData.description,
       amount: String(jsonData.amount),
       advancePayment: jsonData.isAdvancePayment,
+      isPersonal: jsonData.isPersonal,
       category: { id: jsonData.categoryId, description: jsonData.categoryDescription }
     } as Entry;
     (e as any).date = jsonData.date;

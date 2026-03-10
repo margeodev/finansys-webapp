@@ -64,7 +64,10 @@ export class EntryTableComponent implements OnChanges {
     this.isLoading = true;
     this.service.getByUserAndMonth(this.userId, this.dateParam ?? undefined, this.isPersonal).subscribe({
       next: (data) => {
-        this.entries = data;
+        const onlyPersonal = data.filter(e => e.isPersonal);
+        const onlyShared = data.filter(e => !e.isPersonal);
+
+        this.entries = this.isPersonal ? onlyPersonal : onlyShared;
         this.isLoading = false;
       },
       error: () => {

@@ -8,6 +8,7 @@ export class Entry {
         public category?: Category,
         public user?: User,
         public amount?: string,
-        public advancePayment?: boolean
+        public advancePayment?: boolean,
+        public isPersonal?: boolean
     ) {}
 }
