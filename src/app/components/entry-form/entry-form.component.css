@@ -1,0 +1,68 @@
+.entry-form {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Em qualquer resolução: label acima do input, com pouco espaço */
+.entry-form .flex.items-center {
+  flex-direction: column;
+  align-items: stretch;
+  row-gap: 0.1rem; /* espaço mínimo entre label e input */
+}
+
+.entry-form label {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.entry-label {
+  margin-bottom: -16px !important;
+}
+
+/* remove qualquer margem superior padrão dos inputs dentro do formulário */
+.entry-form input,
+.entry-form .p-inputnumber input {
+  margin-top: 0;
+}
+
+/* Estilo do select de categoria */
+.entry-form select#categoryId {
+  padding: 0.6rem 0.75rem; /* aumenta o padding interno */
+}
+
+/* Linha do checkbox continua em linha única */
+.entry-form .flex.items-center.pessoal-row {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* No row do checkbox, o label não ocupa a largura toda para permitir ficar lado a lado */
+.entry-form .pessoal-row .entry-label {
+  width: auto;
+  margin-right: 0.5rem;
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .btn-cancelar {
+    display: none;
+  }
+
+  .btn-salvar ::ng-deep .p-button {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 0.75rem 2rem;
+  }
+}
+

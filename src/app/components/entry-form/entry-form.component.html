@@ -1,5 +1,6 @@
+<div class="entry-form">
 <div class="flex items-center gap-4 mb-4">
-  <label for="description" class="font-semibold w-24">Descrição</label>
+  <label for="description" class="font-semibold w-24 entry-label">Descrição</label>
   <div class="flex flex-col flex-auto">
     <input pInputText id="description" [formControl]="form.controls['description']" class="flex-auto"
       autocomplete="off" />
@@ -10,7 +11,7 @@
   </div>
 </div>
 <div class="flex items-center gap-4 mb-4">
-  <label for="amount" class="font-semibold w-24">Valor</label>
+  <label for="amount" class="font-semibold w-24 entry-label">Valor</label>
   <div class="flex flex-col flex-auto">
     <p-inputNumber 
         mode="currency" 
@@ -29,13 +30,36 @@
 </div>
 
 <div class="flex items-center gap-4 mb-4">
-  <label for="amount" class="font-semibold w-24">Pessoal</label>
+  <label for="categoryId" class="font-semibold w-24 entry-label">Categoria</label>
   <div class="flex flex-col flex-auto">
-    <p-checkbox  [formControl]="form.controls['isPersonal']" binary="true"></p-checkbox>
+    <p-select
+      inputId="categoryId"
+      [options]="categories"
+      optionLabel="description"
+      optionValue="id"
+      placeholder="Selecione"
+      appendTo="body"
+      [formControl]="form.controls['categoryId']"
+      class="w-full">
+    </p-select>
+
+    @if (form.controls['categoryId'].invalid && form.controls['categoryId'].touched) {
+      <div class="text-red-500 text-sm">A categoria é obrigatória</div>
+    }
   </div>
 </div>
 
-<div class="flex justify-end gap-2">
-  <p-button label="Cancel" severity="secondary" (click)="onCancel()" />
-  <p-button label="Save" (click)="saveEntry()" />
+<div class="flex items-center gap-2 mb-4 pessoal-row">
+  <label for="isPersonal" class="font-semibold w-24 entry-label">Pessoal</label>
+  <p-checkbox
+    inputId="isPersonal"
+    [formControl]="form.controls['isPersonal']"
+    binary="true">
+  </p-checkbox>
+</div>
+
+<div class="actions mt-4">
+  <p-button label="Cancelar" severity="secondary" (click)="onCancel()" class="btn-cancelar" />
+  <p-button label="Salvar" (click)="saveEntry()" class="btn-salvar" />
+</div>
 </div>

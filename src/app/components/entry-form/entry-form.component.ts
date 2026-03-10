@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from "primeng/button";
+import { ButtonModule } from 'primeng/button';
 import { Entry } from '../../pages/entries/model/entry.model';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
@@ -11,10 +11,11 @@ import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 import { Checkbox } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-entry-form',
-  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule, Checkbox, InputNumberModule ],
+  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule, Checkbox, InputNumberModule, SelectModule],
   templateUrl: './entry-form.component.html',
   styleUrl: './entry-form.component.css'
 })
@@ -25,21 +26,21 @@ export class EntryFormComponent {
   @Input() entryToEdit: any | null = null;
   @Input() isEditing: boolean = false;
   @Input() userId: number | null | undefined = null;
-  categorias: { [key: string]: string[] } = {
-    "1": ["aluguel", "alugueis", "condominio", "iptu", "casa", "casas", "moradia", "terreno"],
-    "2": ["mercado", "mercados", "supermercado", "supermercados", "compra", "compras"],
-    "3": ["energia", "conta energia", "conta de energia", "agua", "conta agua", "conta de agua", "luz", "telefone", "telefones", "internet", "netflix", "conta de luz"],
-    "4": ["gasolina", "uber", "onibus", "transporte", "transportes", "combustivel", "taxi"],
-    "5": ["cinema", "festa", "festas", "lazer", "show", "viagem"],
-    "6": ["medico", "hospital", "saude", "exame", "exames", "consulta", "consultas"],
-    "7": ["bar", "restaurante", "restaurante chines", "almoço", "janta", "comida chinesa", "habbibs", "habibs", "habibes", "habibis", "macdonalds", "mcdonalds", "ifood", "lanche", "lanches", "pizza", "pizzas", "pizzaria", "jantar", "almoco", "almocos", "cafe", "cafes", "bebida", "bebidas", "churrasco", "churrascos", "agua de coco", "aguas de coco"],
-    "8": ["manutencao", "reforma", "reformas", "obra"],
-    "9": ["padaria", "padarias", "pao", "paes", "bolo"],
-    "10": ["farmacia", "farmacias", "remedio", "remedios", "medicamento", "medicamentos"],
-    "11": ["outros", "diverso", "diversos"],
-    "12": ["pet", "pets", "cachorro", "cachorros", "gato", "gatos", "racao", "racoes", "areia gato", "areia para gato", "areia do gato", "banho e tosa", "banho", "tosa"],
-    "13": ["carro", "carros", "oficina", "oficinas", "mecanico", "mecanico", "pneu", "pneus", "manutençao carro", "manutencao carro", "manutençao do carro", "manutençao carros"]
-  };
+  categories = [
+    { id: '1', description: 'Moradia' },
+    { id: '2', description: 'Mercado' },
+    { id: '3', description: 'Contas (água, luz, internet)' },
+    { id: '4', description: 'Transporte' },
+    { id: '5', description: 'Lazer' },
+    { id: '6', description: 'Saúde' },
+    { id: '7', description: 'Restaurantes / Comida fora' },
+    { id: '8', description: 'Manutenção / Reforma' },
+    { id: '9', description: 'Padaria' },
+    { id: '10', description: 'Farmácia' },
+    { id: '11', description: 'Outros' },
+    { id: '12', description: 'Pet' },
+    { id: '13', description: 'Carro' },
+  ];
 
   constructor(
     private service: EntryService,
@@ -50,7 +51,8 @@ export class EntryFormComponent {
   form = new FormGroup({
     description: new FormControl('', [Validators.required]),
     amount: new FormControl(null, [Validators.required]),
-    isPersonal: new FormControl(false)
+    categoryId: new FormControl<string | null>(null, [Validators.required]),
+    isPersonal: new FormControl(false),
   });
 
   saveEntry(): void {
@@ -58,55 +60,16 @@ export class EntryFormComponent {
       this.form.markAllAsTouched(); // força exibir mensagens de erro
       return;
     }
-    const formValue = this.form.value;    
-
-    // Sempre recalcula a categoria a partir da descrição
-    const categoriaId = this.getCategoriaIdByTerm(formValue.description!);
+    const formValue = this.form.value;
     const entry = new EntryRequest(
       formValue.description!,
       formValue.amount!,
-      categoriaId,
+      formValue.categoryId!,
       false,
       formValue.isPersonal!,
       this.userId ?? undefined
     );
     this.createEntry(entry);
-  }
-
-  private getCategoriaIdByTerm(term: string): string {
-    const normalize = (str: string) =>
-      str
-        .trim()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-
-    const tokens = normalize(term).split(/\s+/); // quebra em palavras
-
-    let bestCategoria = "11"; // default: outros
-    let bestScore = 0;
-
-    for (const [id, termos] of Object.entries(this.categorias)) {
-      let score = 0;
-
-      for (const t of termos) {
-        const normalizedT = normalize(t);
-
-        for (const token of tokens) {
-          // Se o token aparece no termo ou vice-versa, soma ponto
-          if (normalizedT.includes(token) || token.includes(normalizedT)) {
-            score++;
-          }
-        }
-      }
-
-      if (score > bestScore) {
-        bestScore = score;
-        bestCategoria = id;
-      }
-    }
-
-    return bestCategoria;
   }
 
   private showMessage(severity: NotificationType, summary: string, message: string) {

@@ -51,3 +51,14 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .p-select-overlay {
+    min-width: 88vw !important;
+  }
+
+  .p-select-option {
+    font-size: 1.3rem !important;
+    padding: 1rem 1.25rem !important;
+  }
+}
+

@@ -6,3 +6,25 @@
   min-width: 180px;
 }
 
+@media (max-width: 768px) {
+  /* Esconde a coluna de categoria em telas pequenas */
+  th.col-category,
+  td.col-category {
+    display: none;
+  }
+
+  /* Esconde a coluna de data em telas pequenas */
+  th.col-data,
+  td.col-data {
+    display: none;
+  }
+
+  /* Esconde a coluna Pago em telas pequenas */
+  th.col-acoes,
+  td.col-acoes {
+    display: none;
+  }
+
+  /* (categoria inteira escondida no mobile) */
+}
+

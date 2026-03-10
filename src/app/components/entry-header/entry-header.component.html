@@ -1,29 +1,49 @@
 <p-card>
   <div class="card-content">
     <div class="user-info">
-      <span class="user-label">Usuário:
+      <span class="user-line">
+        <span class="user-label">Usuário:</span>
         <span class="user-name">{{ userName }}</span>
       </span>
-      <p-button icon="pi pi-plus" (click)="showCreateDialog()" label="Adicionar" />
+
+      <div class="totals-box">
+        <span class="totals-row">
+          <span class="totals-label">Total:</span>
+          <span class="value">
+            {{ subTotal | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
+          </span>
+        </span>
+      </div>
+
+      <div class="add-button-wrapper">
+        <p-button
+          icon="pi pi-plus"
+          (click)="showCreateDialog()"
+          label="Adicionar"
+        />
+      </div>
     </div>
 
-    <p-divider layout="vertical" />
+    <p-divider layout="vertical" class="desktop-only" />
 
-    <div class="totals-box">
-      <span class="totals-row">Total:
-        <span class="value">{{ subTotal | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</span>
+    <div class="totals-box desktop-only">
+      <span class="totals-row">
+        Adiantamento:
+        <span class="value">
+          {{ advance | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
+        </span>
       </span>
 
-      <span class="totals-row">Adiantamento:
-        <span class="value">{{ advance | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</span>
-      </span>
-
-      <span class="totals-row">Saldo:
-        <span *ngIf="saldo !== null" [ngClass]="{
-          'positive': saldo > 0,
-          'negative': saldo < 0,
-          'neutral': saldo === 0
-        }">
+      <span class="totals-row">
+        Saldo:
+        <span
+          *ngIf="saldo !== null"
+          [ngClass]="{
+            positive: saldo > 0,
+            negative: saldo < 0,
+            neutral: saldo === 0
+          }"
+        >
           {{ saldo | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
         </span>
       </span>
@@ -31,6 +51,6 @@
   </div>
 </p-card>
 
-<p-dialog header="Nova Despesa" [modal]="true" [(visible)]="visible" class="dialog-box">
+<p-dialog header="Nova Despesa" [modal]="true" [(visible)]="visible" [style]="{'width': '25rem'}" [breakpoints]="{'768px': '92vw'}">
   <app-entry-form [userId]="userHeader?.id"></app-entry-form>
 </p-dialog>
