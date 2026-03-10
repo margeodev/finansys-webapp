@@ -1,23 +1,24 @@
-import { Component, OnInit } from "@angular/core";
-import { catchError, forkJoin, Observable, of } from "rxjs";
-import { DividerModule } from "primeng/divider";
-import { EntryService } from "./service/entry.service";
-import { CommonModule } from "@angular/common";
-import { CustomBreadcrumb } from "../../shared/breadcrumb/custom-breadcrumb";
-import { PageHeader } from "../../shared/page-header/page-header";
-import { UserService } from "./service/user.service";
-import { User } from "../login/model/user.model";
+import { Component, OnInit } from '@angular/core';
+import { catchError, forkJoin, Observable, of } from 'rxjs';
+import { DividerModule } from 'primeng/divider';
+import { EntryService } from './service/entry.service';
+import { CommonModule } from '@angular/common';
+import { CustomBreadcrumb } from '../../shared/breadcrumb/custom-breadcrumb';
+import { PageHeader } from '../../shared/page-header/page-header';
+import { UserService } from './service/user.service';
+import { User } from '../login/model/user.model';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { UserHeader } from "./model/user-header.model";
-import { BalanceResponse } from "./model/balance.model";
-import { EntryHeaderComponent } from "../../components/entry-header/entry-header.component";
-import { EntryTableComponent } from "../../components/entry-table/entry-table.component";
-import { EntryEventsService } from "./service/entry-event.service";
-import { SelectedMonthService } from "../../shared/service/selected-month.service";
-import { Button } from "primeng/button";
-import { DatePickerModule } from "primeng/datepicker";
-import { TabsModule } from "primeng/tabs";
-import { FormsModule } from "@angular/forms";
+import { UserHeader } from './model/user-header.model';
+import { BalanceResponse } from './model/balance.model';
+import { EntryHeaderComponent } from '../../components/entry-header/entry-header.component';
+import { EntryTableComponent } from '../../components/entry-table/entry-table.component';
+import { EntryEventsService } from './service/entry-event.service';
+import { SelectedMonthService } from '../../shared/service/selected-month.service';
+import { Button } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
+import { TabsModule } from 'primeng/tabs';
+import { FormsModule } from '@angular/forms';
+import { CurrentUserService } from '../../shared/current-user.service';
 
 @Component({
   selector: 'app-entries',
@@ -35,7 +36,7 @@ import { FormsModule } from "@angular/forms";
     Button
   ],
   templateUrl: './entries.html',
-  styleUrl: './entries.css'
+  styleUrl: './entries.css',
 })
 export class Entries implements OnInit {
   users: User[] = [];
@@ -45,6 +46,12 @@ export class Entries implements OnInit {
   userTwoHeader: UserHeader | null = null;
   shouldReloadTable: boolean = false;
   totalExpenses: number = 0;
+
+  // controle de papel
+  isAdmin = false;
+  currentUserName: string | null = null;
+  // qual índice em this.users representa o usuário logado (0 ou 1)
+  currentUserIndex: number | null = null;
 
   mesAnoSelecionado: Date | null = null;
   minDate: Date | undefined;
@@ -57,13 +64,19 @@ export class Entries implements OnInit {
     private userService: UserService,
     private entryService: EntryService,
     private entryEvents: EntryEventsService,
-    private selectedMonthService: SelectedMonthService
+    private selectedMonthService: SelectedMonthService,
+    private currentUserService: CurrentUserService
   ) {}
 
   ngOnInit(): void {
-    this.loadUsersData();
-    this.listenEntryCreatedEvent();
     this.handleDate();
+
+    this.currentUserService.getCurrentUserInfo().subscribe((info) => {
+      this.isAdmin = info.role === 'admin';
+      this.currentUserName = info.username;
+      this.loadUsersData();
+      this.listenEntryCreatedEvent();
+    });
   }
 
   load() {
@@ -122,6 +135,16 @@ export class Entries implements OnInit {
     this.userService.getAll().subscribe({
       next: (users) => {
         this.users = users;
+
+        // descobre qual índice corresponde ao usuário logado (se não for admin)
+        if (!this.isAdmin && this.currentUserName) {
+          const idx = users.findIndex(
+            (u) => u.username?.toLowerCase() === this.currentUserName!.toLowerCase()
+          );
+          this.currentUserIndex = idx >= 0 ? idx : null;
+        } else {
+          this.currentUserIndex = null;
+        }
 
         forkJoin([
           this.getUserBalance(users[0].id!, dateParam),

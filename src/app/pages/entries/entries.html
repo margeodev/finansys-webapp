@@ -31,7 +31,8 @@
 
 <ng-container *ngIf="userOneHeader != null; else loading">
   <div class="flex justify-between">
-    <div class="flex flex-col w-full">
+    <!-- Coluna usuário 1 (Ana) -->
+    <div class="flex flex-col w-full" *ngIf="isAdmin || currentUserIndex === 0">
       <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
       <p-divider />
       <p-tabs value="0">
@@ -63,9 +64,13 @@
       </p-tabs>
     </div>
 
-    <p-divider layout="vertical" />
+    <p-divider
+      layout="vertical"
+      *ngIf="(isAdmin || currentUserIndex === 0) && (isAdmin || currentUserIndex === 1)"
+    />
 
-    <div class="flex flex-col w-full">
+    <!-- Coluna usuário 2 (Marcio) -->
+    <div class="flex flex-col w-full" *ngIf="isAdmin || currentUserIndex === 1">
       <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
       <p-divider />
 

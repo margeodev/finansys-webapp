@@ -7,6 +7,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './pages/login/interceptor/auth.interceptor'; // atenção: minúsculo
@@ -18,9 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     MessageService,
     ConfirmationService,
-    provideHttpClient(
-      withInterceptors([authInterceptor]) // 🔹 função, não classe
-    ),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({
       inputVariant: 'filled',
@@ -29,6 +28,7 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => getAuth())
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore())
   ]
 };
