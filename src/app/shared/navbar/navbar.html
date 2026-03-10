@@ -1,5 +1,14 @@
 <p-menubar [model]="items">
-    <ng-template pTemplate="end">
-        <p-button label="Sair" icon="pi pi-sign-out" (onClick)="logout()" severity="secondary" />
-    </ng-template>
+  <ng-template pTemplate="end">
+    <span class="mr-3" *ngIf="currentUser$ | async as user">
+      <i class="pi pi-user mr-1"></i>
+      {{ user.username || user.email }}
+    </span>
+    <p-button
+      label="Sair"
+      icon="pi pi-sign-out"
+      (onClick)="logout()"
+      severity="secondary"
+    />
+  </ng-template>
 </p-menubar>

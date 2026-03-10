@@ -4,20 +4,27 @@ import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
 import { AuthService } from '../../pages/login/service/auth.service';
 import { Button } from 'primeng/button';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { CurrentUserService, CurrentUserInfo } from '../current-user.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MenubarModule, Button],
+  imports: [MenubarModule, Button, AsyncPipe, NgIf],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class Navbar {
   items: MenuItem[] | undefined;
 
+  currentUser$!: Observable<CurrentUserInfo>;
+
   private auth = inject(AuthService);
   private router = inject(Router);
+  private currentUserService = inject(CurrentUserService);
 
   ngOnInit() {
+      this.currentUser$ = this.currentUserService.getCurrentUserInfo();
       this.items = [
           {
               label: 'Relatórios',
