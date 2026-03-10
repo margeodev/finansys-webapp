@@ -2,12 +2,13 @@ import { Routes } from '@angular/router';
 import { Entries } from './pages/entries/entries';
 import { LoginComponent } from './pages/login/login.component';
 import { ReportsComponent } from './pages/reports/reports.component';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'entries', pathMatch: 'full' },
-  { path: 'entries', component: Entries },
-  { path: 'reports', component: ReportsComponent },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: '**', redirectTo: 'entries' }
+  { path: 'entries', component: Entries, canActivate: [authGuard] },
+  { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
+  { path: '**', redirectTo: 'login' }
 ];
 
