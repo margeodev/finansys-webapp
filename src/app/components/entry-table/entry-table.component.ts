@@ -11,6 +11,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 
@@ -26,7 +27,8 @@ import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
     SkeletonModule,
     ConfirmDialogModule,
     ConfirmDialog,
-    TruncatePipe
+    TruncatePipe,
+    TooltipModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './entry-table.component.html',
@@ -35,12 +37,11 @@ import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 export class EntryTableComponent implements OnChanges {
   @Input() userName: string | null = null;
   @Input() userId: number | null = null;
-  @Input() dateParam: string | null = null; // 🔥 recebe a data do pai
-  @Input() reload: boolean = false;
-  @Input() isPersonal: boolean = false; // 🔥 novo input para isPersonal
+  @Input() dateParam: string | null = null;
+  @Input() isPersonal: boolean = false;
+  @Input() allEntries: Entry[] = [];
 
   entries: Entry[] = [];
-  isLoading: boolean = false;
   isEditing: boolean = false;
   visible: boolean = false;
 
@@ -52,29 +53,11 @@ export class EntryTableComponent implements OnChanges {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    const reloadChanged = !!changes['reload'];
-    if (reloadChanged) {
-      this.loadEntries();
+    if (changes['allEntries'] || changes['isPersonal']) {
+      this.entries = this.isPersonal
+        ? this.allEntries.filter(e => e.isPersonal)
+        : this.allEntries;
     }
-  }
-
-  private loadEntries(): void {
-    if (!this.userId) return;
-
-    this.isLoading = true;
-    this.service.getByUserAndMonth(this.userId, this.dateParam ?? undefined, this.isPersonal).subscribe({
-      next: (data) => {
-        const onlyPersonal = data.filter(e => e.isPersonal);
-        const onlyShared = data.filter(e => !e.isPersonal);
-
-        this.entries = this.isPersonal ? onlyPersonal : onlyShared;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-        this.showMessage(NotificationType.ERROR, '', 'Erro ao carregar lançamentos');
-      }
-    });
   }
 
   onToggleChange(event: any, entry: Entry): void {
@@ -145,22 +128,21 @@ export class EntryTableComponent implements OnChanges {
 
   getCategoryColor(categoryId: number): string {
     const colorMap: { [key: number]: string } = {
-      1: '--color-blue',
-      2: '--color-green',
-      3: '--color-orange',
-      4: '--color-purple',
-      5: '--color-deep-orange',
-      6: '--color-cyan',
-      7: '--color-indigo',
-      8: '--color-pink',
-      9: '--color-light-green',
-      10: '--color-yellow',
-      11: '--color-blue-grey',
-      12: '--color-teal',
-      13: '--color-lime'
+      1: '#1565C0',
+      2: '#2E7D32',
+      3: '#E65100',
+      4: '#6A1B9A',
+      5: '#BF360C',
+      6: '#00838F',
+      7: '#283593',
+      8: '#AD1457',
+      9: '#558B2F',
+      10: '#F9A825',
+      11: '#546E7A',
+      12: '#00695C',
+      13: '#827717'
     };
 
-    const variableName = colorMap[categoryId] || '--color-blue';
-    return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+    return colorMap[categoryId] || '#1565C0';
   }
 }

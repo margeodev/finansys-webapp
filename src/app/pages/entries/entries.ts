@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { catchError, forkJoin, Observable, of } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { forkJoin, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DividerModule } from 'primeng/divider';
 import { EntryService } from './service/entry.service';
 import { CommonModule } from '@angular/common';
@@ -9,7 +10,7 @@ import { UserService } from './service/user.service';
 import { User } from '../login/model/user.model';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { UserHeader } from './model/user-header.model';
-import { BalanceResponse } from './model/balance.model';
+import { Entry } from './model/entry.model';
 import { EntryHeaderComponent } from '../../components/entry-header/entry-header.component';
 import { EntryTableComponent } from '../../components/entry-table/entry-table.component';
 import { EntryEventsService } from './service/entry-event.service';
@@ -38,19 +39,16 @@ import { CurrentUserService } from '../../shared/current-user.service';
   templateUrl: './entries.html',
   styleUrl: './entries.css',
 })
-export class Entries implements OnInit {
+export class Entries implements OnInit, OnDestroy {
   users: User[] = [];
-  userNameOne: string = '';
-  userNameTwo: string = '';
   userOneHeader: UserHeader | null = null;
   userTwoHeader: UserHeader | null = null;
-  shouldReloadTable: boolean = false;
+  userOneEntries: Entry[] = [];
+  userTwoEntries: Entry[] = [];
   totalExpenses: number = 0;
 
-  // controle de papel
   isAdmin = false;
   currentUserName: string | null = null;
-  // qual índice em this.users representa o usuário logado (0 ou 1)
   currentUserIndex: number | null = null;
 
   mesAnoSelecionado: Date | null = null;
@@ -58,7 +56,9 @@ export class Entries implements OnInit {
   maxDate: Date | undefined;
   isLoading: boolean = false;
 
-  dateParam: string | null = null; // 🔥 data formatada (yyyy-MM-01)
+  dateParam: string | null = null;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private userService: UserService,
@@ -71,12 +71,19 @@ export class Entries implements OnInit {
   ngOnInit(): void {
     this.handleDate();
 
-    this.currentUserService.getCurrentUserInfo().subscribe((info) => {
-      this.isAdmin = info.role === 'admin';
-      this.currentUserName = info.username;
-      this.loadUsersData();
-      this.listenEntryCreatedEvent();
-    });
+    this.currentUserService.getCurrentUserInfo()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((info) => {
+        this.isAdmin = info.role === 'admin';
+        this.currentUserName = info.username;
+        this.loadUsersData();
+        this.listenEntryEvents();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   load() {
@@ -85,27 +92,13 @@ export class Entries implements OnInit {
       return;
     }
 
-    this.isLoading = true;
-
-    // força o dia = 1
     const data = new Date(this.mesAnoSelecionado);
-    const ano = data.getFullYear();
-    const mes = data.getMonth();
-    const dataFormatada = new Date(ano, mes, 1);
-
-    // yyyy-MM-dd
+    const dataFormatada = new Date(data.getFullYear(), data.getMonth(), 1);
     this.dateParam = dataFormatada.toISOString().split('T')[0];
-    console.log('Consultando período:', this.dateParam);
 
-    // atualiza seleção compartilhada de mês (yyyy-MM-01)
     this.selectedMonthService.setSelectedMonth(dataFormatada);
-
+    this.isLoading = true;
     this.loadUsersData(this.dateParam);
-
-    setTimeout(() => {
-      this.isLoading = false;
-      this.shouldReloadTable = !this.shouldReloadTable; // força reload tabelas
-    }, 1000);
   }
 
   private handleDate() {
@@ -113,114 +106,123 @@ export class Entries implements OnInit {
     this.minDate = new Date(2025, 8, 1);
     this.maxDate = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
 
-    // seleciona por padrão o mês atual e propaga para o serviço
     this.mesAnoSelecionado = this.maxDate;
     this.selectedMonthService.setSelectedMonth(this.maxDate);
   }
 
-  private listenEntryCreatedEvent() {
-    this.entryEvents.entryCreated$.subscribe(() => {
-      this.loadUsersData(this.dateParam ?? undefined);
-      this.shouldReloadTable = !this.shouldReloadTable;
-    });
+  private listenEntryEvents() {
+    this.entryEvents.entryCreated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadUsersData(this.dateParam ?? undefined));
 
-    this.entryEvents.entryUpdated$.subscribe(() => {
-      this.loadUsersData(this.dateParam ?? undefined);
-    });
+    this.entryEvents.entryUpdated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadUsersData(this.dateParam ?? undefined));
   }
 
   private loadUsersData(dateParam?: string): void {
-    console.log('loading users data, date =', dateParam);
+    this.userService.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (users) => {
+          this.users = users;
 
-    this.userService.getAll().subscribe({
-      next: (users) => {
-        this.users = users;
+          if (!this.isAdmin && this.currentUserName) {
+            const idx = users.findIndex(
+              (u) => u.username?.toLowerCase() === this.currentUserName!.toLowerCase()
+            );
+            this.currentUserIndex = idx >= 0 ? idx : null;
+          } else {
+            this.currentUserIndex = null;
+          }
 
-        // descobre qual índice corresponde ao usuário logado (se não for admin)
-        if (!this.isAdmin && this.currentUserName) {
-          const idx = users.findIndex(
-            (u) => u.username?.toLowerCase() === this.currentUserName!.toLowerCase()
-          );
-          this.currentUserIndex = idx >= 0 ? idx : null;
-        } else {
-          this.currentUserIndex = null;
+          if (this.isAdmin) {
+            forkJoin([
+              this.entryService.getByUserAndMonth(users[0].id!, dateParam),
+              this.entryService.getByUserAndMonth(users[1].id!, dateParam),
+            ]).pipe(takeUntil(this.destroy$)).subscribe({
+              next: ([entries1, entries2]) => {
+                this.userOneEntries = entries1;
+                this.userTwoEntries = entries2;
+                this.buildAdminHeaders(users, entries1, entries2);
+                this.isLoading = false;
+              },
+              error: (err) => {
+                console.error('Erro ao buscar lançamentos:', err);
+                this.isLoading = false;
+              }
+            });
+            return;
+          }
+
+          const idx = this.currentUserIndex ?? 0;
+          const current = users[idx];
+          if (!current?.id) {
+            console.warn('Usuário atual não encontrado na lista fixa.');
+            return;
+          }
+
+          this.entryService.getByUserAndMonth(current.id, dateParam)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (entries) => {
+                const balance = this.entryService.computeBalance(entries);
+                const subTotal = balance.subTotalBalance ?? 0;
+                const advance = (balance.totalAdvanceBalance ?? 0) / 2;
+                const header = new UserHeader(current.id, current.username!, subTotal, advance, subTotal);
+
+                if (idx === 0) {
+                  this.userOneEntries = entries;
+                  this.userTwoEntries = [];
+                  this.userOneHeader = header;
+                  this.userTwoHeader = null;
+                } else {
+                  this.userTwoEntries = entries;
+                  this.userOneEntries = [];
+                  this.userTwoHeader = header;
+                  this.userOneHeader = null;
+                }
+
+                this.totalExpenses = header.subtotal ?? 0;
+                this.isLoading = false;
+              },
+              error: (err) => {
+                console.error('Erro ao buscar lançamentos:', err);
+                this.isLoading = false;
+              }
+            });
+        },
+        error: (err) => {
+          console.error('Erro ao buscar usuários:', err);
+          this.isLoading = false;
         }
-
-        forkJoin([
-          this.getUserBalance(users[0].id!, dateParam),
-          this.getUserBalance(users[1].id!, dateParam)
-        ]).subscribe({
-          next: ([balance1, balance2]) => {
-            let subTotalBalanceOne = balance1.subTotalBalance ?? 0;
-            let subTotalBalanceTwo = balance2.subTotalBalance ?? 0;
-            let advance1 = balance1.totalAdvanceBalance ?? 0;
-            let advance2 = balance2.totalAdvanceBalance ?? 0;
-            this.totalExpenses =
-              subTotalBalanceOne +
-              subTotalBalanceTwo +
-              (advance1 + advance2) / 2;
-
-            advance1 = advance1 / 2;
-            advance2 = advance2 / 2;
-            subTotalBalanceOne = subTotalBalanceOne - advance1;
-            subTotalBalanceTwo = subTotalBalanceTwo - advance2;
-
-            let total1 = subTotalBalanceOne + advance1 + advance2;
-            let total2 = subTotalBalanceTwo + advance2 + advance1;
-
-            let saldo1: number = this.calculateSaldoDefault(
-              subTotalBalanceOne,
-              subTotalBalanceTwo
-            );
-            let saldo2: number = -saldo1;
-
-            this.userOneHeader = new UserHeader(
-              users[0].id!,
-              users[0].username!,
-              total1,
-              advance1,
-              saldo1
-            );
-
-            this.userTwoHeader = new UserHeader(
-              users[1].id!,
-              users[1].username!,
-              total2,
-              advance2,
-              saldo2
-            );
-          },
-          error: (err) => console.error('Erro ao buscar balances:', err)
-        });
-      },
-      error: (err) => console.error('Erro ao buscar usuários:', err)
-    });
+      });
   }
 
-  private calculateSaldoDefault(
-    subTotalOne: number,
-    subTotalTwo: number
-  ): number {
-    if (subTotalOne === subTotalTwo) {
-      return 0;
-    }
+  private buildAdminHeaders(users: User[], entries1: Entry[], entries2: Entry[]): void {
+    const balance1 = this.entryService.computeBalance(entries1);
+    const balance2 = this.entryService.computeBalance(entries2);
+
+    let subTotalOne = balance1.subTotalBalance ?? 0;
+    let subTotalTwo = balance2.subTotalBalance ?? 0;
+    let advance1 = (balance1.totalAdvanceBalance ?? 0) / 2;
+    let advance2 = (balance2.totalAdvanceBalance ?? 0) / 2;
+
+    this.totalExpenses = (subTotalOne + subTotalTwo) + advance1 + advance2;
+
+    subTotalOne = subTotalOne - advance1;
+    subTotalTwo = subTotalTwo - advance2;
+
+    const total1 = subTotalOne + advance1 + advance2;
+    const total2 = subTotalTwo + advance2 + advance1;
+    const saldo1 = this.calculateSaldo(subTotalOne, subTotalTwo);
+
+    this.userOneHeader = new UserHeader(users[0].id!, users[0].username!, total1, advance1, saldo1);
+    this.userTwoHeader = new UserHeader(users[1].id!, users[1].username!, total2, advance2, -saldo1);
+  }
+
+  private calculateSaldo(subTotalOne: number, subTotalTwo: number): number {
+    if (subTotalOne === subTotalTwo) return 0;
     return (subTotalOne - subTotalTwo) / 2;
-  }
-
-  private getUserBalance(
-    userId: number,
-    dateParam?: string
-  ): Observable<BalanceResponse> {
-    return this.entryService.getUserTotal(userId, dateParam).pipe(
-      catchError((err) => {
-        console.error('Erro ao buscar total do usuário:', err);
-        return of(new BalanceResponse(0, 0));
-      })
-    );
-  }
-
-  handleCreatedEntry() {
-    this.loadUsersData(this.dateParam ?? undefined);
-    this.shouldReloadTable = !this.shouldReloadTable;
   }
 }

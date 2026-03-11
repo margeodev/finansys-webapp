@@ -29,83 +29,84 @@
 
 <p-divider />
 
-<ng-container *ngIf="userOneHeader != null; else loading">
+@if (userOneHeader != null || userTwoHeader != null) {
   <div class="flex justify-between">
-    <!-- Coluna usuário 1 (Ana) -->
-    <div class="flex flex-col w-full" *ngIf="isAdmin || currentUserIndex === 0">
-      <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
-      <p-divider />
-      <p-tabs value="0">
-        <p-tablist>
-          <p-tab value="0">Compartilhadas</p-tab>
-          <p-tab value="1">Pessoal</p-tab>
-        </p-tablist>
+    <!-- Coluna usuário 1 -->
+    @if (isAdmin || currentUserIndex === 0) {
+      <div class="flex flex-col w-full">
+        <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
+        <p-divider />
+        <p-tabs value="0">
+          <p-tablist>
+            <p-tab value="0">Compartilhadas</p-tab>
+            <p-tab value="1">Pessoal</p-tab>
+          </p-tablist>
 
-        <p-tabpanels>
-          <p-tabpanel value="0">
-            <app-entry-table
-              [userName]="userOneHeader!.userName!"
-              [userId]="users[0]?.id ?? null"
-              [dateParam]="dateParam"
-              [reload]="shouldReloadTable">
-            </app-entry-table>
-          </p-tabpanel>
+          <p-tabpanels>
+            <p-tabpanel value="0">
+              <app-entry-table
+                [userName]="userOneHeader!.userName!"
+                [userId]="users[0]?.id ?? null"
+                [dateParam]="dateParam"
+                [allEntries]="userOneEntries">
+              </app-entry-table>
+            </p-tabpanel>
 
-          <p-tabpanel value="1">
-            <app-entry-table
-              [userName]="userOneHeader!.userName!"
-              [userId]="users[0]?.id ?? null"
-              [dateParam]="dateParam"
-              [reload]="shouldReloadTable"
-              [isPersonal]="true">
-            </app-entry-table>
-          </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
-    </div>
+            <p-tabpanel value="1">
+              <app-entry-table
+                [userName]="userOneHeader!.userName!"
+                [userId]="users[0]?.id ?? null"
+                [dateParam]="dateParam"
+                [allEntries]="userOneEntries"
+                [isPersonal]="true">
+              </app-entry-table>
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
+      </div>
+    }
 
-    <p-divider
-      layout="vertical"
-      *ngIf="(isAdmin || currentUserIndex === 0) && (isAdmin || currentUserIndex === 1)"
-    />
+    @if ((isAdmin || currentUserIndex === 0) && (isAdmin || currentUserIndex === 1)) {
+      <p-divider layout="vertical" />
+    }
 
-    <!-- Coluna usuário 2 (Marcio) -->
-    <div class="flex flex-col w-full" *ngIf="isAdmin || currentUserIndex === 1">
-      <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
-      <p-divider />
+    <!-- Coluna usuário 2 -->
+    @if (isAdmin || currentUserIndex === 1) {
+      <div class="flex flex-col w-full">
+        <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
+        <p-divider />
 
-      <p-tabs value="0">
-        <p-tablist>
-          <p-tab value="0">Compartilhadas</p-tab>
-          <p-tab value="1">Pessoal</p-tab>
-        </p-tablist>
+        <p-tabs value="0">
+          <p-tablist>
+            <p-tab value="0">Compartilhadas</p-tab>
+            <p-tab value="1">Pessoal</p-tab>
+          </p-tablist>
 
-        <p-tabpanels>
-          <p-tabpanel value="0">
-            <app-entry-table
-              [userName]="userTwoHeader!.userName!"
-              [userId]="users[1]?.id ?? null"
-              [dateParam]="dateParam"
-              [reload]="shouldReloadTable">
-            </app-entry-table>
-          </p-tabpanel>
+          <p-tabpanels>
+            <p-tabpanel value="0">
+              <app-entry-table
+                [userName]="userTwoHeader!.userName!"
+                [userId]="users[1]?.id ?? null"
+                [dateParam]="dateParam"
+                [allEntries]="userTwoEntries">
+              </app-entry-table>
+            </p-tabpanel>
 
-          <p-tabpanel value="1">
-            <app-entry-table
-              [userName]="userTwoHeader!.userName!"
-              [userId]="users[1]?.id ?? null"
-              [dateParam]="dateParam"
-              [reload]="shouldReloadTable"
-              [isPersonal]="true">
-            </app-entry-table>
-          </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
-    </div>
+            <p-tabpanel value="1">
+              <app-entry-table
+                [userName]="userTwoHeader!.userName!"
+                [userId]="users[1]?.id ?? null"
+                [dateParam]="dateParam"
+                [allEntries]="userTwoEntries"
+                [isPersonal]="true">
+              </app-entry-table>
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
+      </div>
+    }
   </div>
-</ng-container>
-
-<ng-template #loading>
+} @else {
   <div class="flex flex-col items-center justify-center h-64">
     <p-progressSpinner
       styleClass="custom-spinner"
@@ -115,4 +116,4 @@
     </p-progressSpinner>
     <p class="mt-4 text-gray-500">Carregando...</p>
   </div>
-</ng-template>
+}

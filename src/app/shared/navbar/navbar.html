@@ -1,4 +1,8 @@
 <p-menubar [model]="items">
+  <ng-template pTemplate="start">
+    <span class="app-brand">Finansys</span>
+  </ng-template>
+
   <ng-template pTemplate="end">
     <span class="mr-3" *ngIf="currentUser$ | async as user">
       <i class="pi pi-user mr-1"></i>
