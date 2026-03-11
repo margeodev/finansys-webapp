@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, throwError } from 'rxjs';
 import { ReportModel } from '../model/report.model';
 import { environment } from '../../../../environments/environment';
 
@@ -13,19 +13,23 @@ export class ReportService {
 
   constructor(private http: HttpClient) { }
 
-  getByMonth(month: string): Observable<ReportModel[]> {
-    const params = new HttpParams().set('monthsBack', month);
-
+  getByMonth(monthsBack: string): Observable<ReportModel[]> {
+    const params = new HttpParams().set('monthsBack', monthsBack);
     return this.http.get<ReportModel[]>(this.apiUrl, { params }).pipe(
       catchError(this.handleError),
       map(this.jsonDataToReport)
     );
   }
 
-  private jsonDataToReport(jsonData: any[]): ReportModel[] {    
-    const reports: ReportModel[] = [];
-    jsonData.forEach(element => reports.push(element as ReportModel));    
-    return reports;
+  getLastNMonths(n: number, offset: number = 0): Observable<ReportModel[][]> {
+    const calls = Array.from({ length: n }, (_, i) =>
+      this.getByMonth(String(offset + i)).pipe(catchError(() => of([])))
+    );
+    return forkJoin(calls);
+  }
+
+  private jsonDataToReport(jsonData: any[]): ReportModel[] {
+    return jsonData.map(element => element as ReportModel);
   }
 
   private handleError(error: any): Observable<any> {

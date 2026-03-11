@@ -3,6 +3,6 @@ export class ReportModel {
         public id?: string,
         public categoryDescription?: string,
         public month?: string,
-        public total?: string
+        public total?: number
     ) {}
 }

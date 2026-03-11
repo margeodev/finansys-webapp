@@ -16,10 +16,88 @@
   </p-datePicker>
 </div>
 
-<div>
+<!-- KPI Cards -->
+<div class="kpi-grid mb-4">
+
   <p-card>
-    <div class="chart-container">
-      <div echarts [options]="chartOptions" class="chart"></div>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="pi pi-wallet"></i></div>
+      <div class="kpi-label">Total do Mês</div>
+      <div class="kpi-value">{{ totalSpentThisMonth | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
     </div>
   </p-card>
+
+  <p-card>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="pi pi-tag"></i></div>
+      <div class="kpi-label">Maior Categoria</div>
+      <div class="kpi-value kpi-text">{{ biggestCategory }}</div>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="pi pi-list"></i></div>
+      <div class="kpi-label">Lançamentos</div>
+      <div class="kpi-value">{{ numberOfEntries }}</div>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="kpi-card">
+      <div class="kpi-icon"><i class="pi pi-chart-line"></i></div>
+      <div class="kpi-label">vs. Mês Anterior</div>
+      @if (deltaPercent !== null) {
+        <div class="kpi-value" [class.kpi-positive]="deltaPositive" [class.kpi-negative]="!deltaPositive">
+          {{ deltaPercent > 0 ? '+' : '' }}{{ deltaPercent | number:'1.1-1':'pt-BR' }}%
+        </div>
+      } @else {
+        <div class="kpi-value">—</div>
+      }
+    </div>
+  </p-card>
+
 </div>
+
+<!-- Compartilhadas vs Pessoais -->
+<div class="split-grid mb-4">
+
+  <p-card>
+    <div class="split-card">
+      <div class="split-header">
+        <i class="pi pi-users"></i>
+        <span>Despesas Compartilhadas</span>
+      </div>
+      <div class="split-value">{{ sharedTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="split-card">
+      <div class="split-header">
+        <i class="pi pi-user"></i>
+        <span>Despesas Pessoais</span>
+      </div>
+      <div class="split-value">{{ personalTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
+    </div>
+  </p-card>
+
+</div>
+
+<!-- Gráfico de barras: evolução 6 meses -->
+@if (barChartOptions) {
+  <div class="mb-4">
+    <p-card>
+      <div echarts [options]="barChartOptions" class="chart chart-bar"></div>
+    </p-card>
+  </div>
+}
+
+<!-- Gráfico de pizza: por categoria -->
+@if (chartOptions) {
+  <div class="mb-4">
+    <p-card>
+      <div echarts [options]="chartOptions" class="chart"></div>
+    </p-card>
+  </div>
+}
