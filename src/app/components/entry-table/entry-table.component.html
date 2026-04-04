@@ -19,7 +19,7 @@
             [pTooltip]="entry?.category?.description"
             tooltipPosition="top"
             [ngStyle]="{ 'border-color': getCategoryColor(entry?.category?.description), 'color': getCategoryColor(entry?.category?.description) }">
-            <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.description)"></i>
+            <i class="fa-solid" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.description)"></i>
           </span>
           <span>{{ entry.description | truncate: 20 }}</span>
         </div>

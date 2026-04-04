@@ -1,7 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
-import { NotificationType } from '../../shared/notification-type';
 import { Entry } from '../../pages/entries/model/entry.model';
 import { TableModule } from "primeng/table";
 import { ChipModule } from 'primeng/chip';
@@ -62,7 +61,7 @@ export class EntryTableComponent implements OnChanges {
     }
   }
 
-  onToggleChange(event: any, entry: Entry): void {
+  onToggleChange(_event: any, entry: Entry): void {
     const currentValue = entry.advancePayment;
 
     this.confirmationService.confirm({
@@ -99,33 +98,28 @@ export class EntryTableComponent implements OnChanges {
     });
   }
 
-  showEditDialog(entry: Entry) {
+  showEditDialog(_entry: Entry) {
     this.isEditing = true;
     this.visible = true;
-  }
-
-  private showMessage(severity: NotificationType, summary: string, message: string) {
-    this.messageService.clear();
-    this.messageService.add({ severity: severity, summary: summary, detail: message });
   }
 
   getCategoryIcon(description: string): string {
     const iconsMap: { [key: string]: string } = {
       'moradia':        'house',
       'supermercado':   'cart-shopping',
-      'conta serviços': 'lightbulb-dollar',
+      'conta serviços': 'bolt',
       'transporte':     'gas-pump',
-      'lazer':          'joystick',
-      'saúde':          'stethoscope',
-      'bares e rest.':  'fork-knife',
+      'lazer':          'gamepad',
+      'saúde':          'heart-pulse',
+      'bares e rest.':  'utensils',
       'manut. casa':    'screwdriver-wrench',
-      'padaria':        'croissant',
-      'farmácia':       'prescription-bottle-medical',
+      'padaria':        'mug-hot',
+      'farmácia':       'pills',
       'outros':         'list',
-      'pets':           'cat',
-      'manut. carro':   'car-wrench',
+      'pets':           'paw',
+      'manut. carro':   'car',
     };
-    return iconsMap[(description ?? '').toLowerCase()] || 'list';
+    return iconsMap[(description ?? '').toLowerCase()] || 'tag';
   }
 
   getCategoryColor(description: string): string {
@@ -144,6 +138,6 @@ export class EntryTableComponent implements OnChanges {
       'pets':           '#00695C',
       'manut. carro':   '#827717',
     };
-    return colorMap[(description ?? '').toLowerCase()] || '#1565C0';
+    return colorMap[(description ?? '').toLowerCase()] || '#546E7A';
   }
 }
