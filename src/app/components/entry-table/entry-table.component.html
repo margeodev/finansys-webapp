@@ -1,5 +1,5 @@
 <p-table [value]="entries" showGridlines stripedRows [size]="'small'"
-  [paginator]="true" [rows]="15">
+  [paginator]="entries.length > 15" [rows]="15">
 
   <ng-template pTemplate="header">
     <tr>
@@ -18,8 +18,8 @@
             class="category-icon-badge"
             [pTooltip]="entry?.category?.description"
             tooltipPosition="top"
-            [ngStyle]="{ 'border-color': getCategoryColor(entry?.category?.id), 'color': getCategoryColor(entry?.category?.id) }">
-            <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.id)"></i>
+            [ngStyle]="{ 'border-color': getCategoryColor(entry?.category?.description), 'color': getCategoryColor(entry?.category?.description) }">
+            <i class="fa-regular" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.description)"></i>
           </span>
           <span>{{ entry.description | truncate: 20 }}</span>
         </div>
@@ -27,15 +27,25 @@
 
       <td class="col-data">{{ entry.date | date: 'dd/MM/yyyy' }}</td>
 
-      <td>{{ entry.amount | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}</td>
+      <td>{{ entry.amount | brl }}</td>
 
       <td class="col-acoes">
-        <p-toggleswitch [(ngModel)]="entry.advancePayment" 
-                        (onChange)="onToggleChange($event, entry)" 
+        <p-toggleswitch [(ngModel)]="entry.advancePayment"
+                        (onChange)="onToggleChange($event, entry)"
                         [disabled]="isPersonal"/>
       </td>
     </tr>
   </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="4" class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <span>Nenhum lançamento encontrado para este mês</span>
+      </td>
+    </tr>
+  </ng-template>
+
 </p-table>
 
 <p-confirmdialog>

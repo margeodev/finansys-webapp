@@ -1,8 +1,19 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { from, switchMap } from 'rxjs';
+import { SupabaseService } from '../../../shared/supabase.service';
 
-// Por enquanto não anexamos nenhum token nas requisições HTTP.
-// Quando a API passar a validar o ID token do Firebase, podemos atualizar aqui.
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  return next(req);
-};
+  const supabase = inject(SupabaseService);
 
+  return from(supabase.client.auth.getSession()).pipe(
+    switchMap(({ data }) => {
+      const token = data.session?.access_token;
+      if (!token) return next(req);
+
+      return next(req.clone({
+        setHeaders: { Authorization: `Bearer ${token}` }
+      }));
+    })
+  );
+};

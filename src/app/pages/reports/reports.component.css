@@ -23,10 +23,23 @@
 }
 
 .kpi-icon {
-  font-size: 1.4rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
   color: #94a3b8;
-  margin-bottom: 0.5rem;
+  background: #f1f5f9;
 }
+
+/* Variantes de cor dos KPI icons */
+.kpi-green .kpi-icon  { color: #16a34a; background: rgba(22, 163, 74, 0.1); }
+.kpi-blue .kpi-icon   { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.kpi-violet .kpi-icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+.kpi-amber .kpi-icon  { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
 
 .kpi-label {
   font-size: 0.75rem;
@@ -73,6 +86,13 @@
   color: #64748b;
   margin-bottom: 0.75rem;
 }
+
+/* Variantes de cor dos split cards */
+.split-blue  { border-left: 4px solid #3b82f6; padding-left: 1rem; }
+.split-violet { border-left: 4px solid #8b5cf6; padding-left: 1rem; }
+
+.split-blue .split-header  { color: #3b82f6; }
+.split-violet .split-header { color: #8b5cf6; }
 
 .split-value {
   font-size: 1.75rem;

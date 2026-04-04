@@ -1,3 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Sora', sans-serif;
+}
+
+:host ::ng-deep .p-datatable {
+  font-family: 'Sora', sans-serif !important;
+  font-size: 0.82rem !important;
+}
+
+:host ::ng-deep .p-datatable-thead > tr > th {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-top: none !important;
+  color: #64748b !important;
+  font-family: 'Sora', sans-serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  padding: 10px 14px !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  color: #334155 !important;
+  font-size: 0.82rem !important;
+  vertical-align: middle !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr:hover > td {
+  background: #f8fafc !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td:nth-child(3) {
+  font-family: 'DM Mono', monospace !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  color: #0f172a !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td:nth-child(2) {
+  color: #94a3b8 !important;
+  font-size: 0.78rem !important;
+}
+
 .col-descricao {
   min-width: 180px;
 }
@@ -6,14 +59,43 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
   border-radius: 50%;
   border: 1.5px solid;
   background: transparent;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   cursor: default;
+  transition: transform 0.15s;
+}
+
+.category-icon-badge:hover {
+  transform: scale(1.1);
+}
+
+:host ::ng-deep .p-toggleswitch {
+  transform: scale(0.85);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px !important;
+  gap: 10px;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 2rem;
+  color: #cbd5e1;
+}
+
+.empty-state span {
+  font-size: 0.82rem;
+  color: #94a3b8;
 }
 
 @media (max-width: 768px) {
@@ -27,4 +109,3 @@
     display: none;
   }
 }
-

@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { Entry } from '../../pages/entries/model/entry.model';
 import { CommonModule } from '@angular/common';
@@ -12,6 +13,7 @@ import { EntryEventsService } from '../../pages/entries/service/entry-event.serv
 import { Checkbox } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-entry-form',
@@ -19,34 +21,28 @@ import { SelectModule } from 'primeng/select';
   templateUrl: './entry-form.component.html',
   styleUrl: './entry-form.component.css'
 })
-export class EntryFormComponent {
+export class EntryFormComponent implements OnInit {
   entries: Entry[] = [];
   visible: boolean = false;
   isPersonal: boolean = false;
   @Input() entryToEdit: any | null = null;
   @Input() isEditing: boolean = false;
-  @Input() userId: number | null | undefined = null;
-  categories = [
-    { id: '1', description: 'Moradia' },
-    { id: '2', description: 'Mercado' },
-    { id: '3', description: 'Contas (água, luz, internet)' },
-    { id: '4', description: 'Transporte' },
-    { id: '5', description: 'Lazer' },
-    { id: '6', description: 'Saúde' },
-    { id: '7', description: 'Restaurantes / Comida fora' },
-    { id: '8', description: 'Manutenção / Reforma' },
-    { id: '9', description: 'Padaria' },
-    { id: '10', description: 'Farmácia' },
-    { id: '11', description: 'Outros' },
-    { id: '12', description: 'Pet' },
-    { id: '13', description: 'Carro' },
-  ];
+  @Input() userId: string | null | undefined = null;
+  categories: { id: string; description: string }[] = [];
 
   constructor(
     private service: EntryService,
     private messageService: MessageService,
-    private entryEvents: EntryEventsService
+    private entryEvents: EntryEventsService,
+    private http: HttpClient
   ) { }
+
+  ngOnInit(): void {
+    this.http.get<any[]>(`${environment.apiUrl}/categories?isActive=true`).subscribe({
+      next: (data) => this.categories = data.map(c => ({ id: c.id, description: c.description })),
+      error: () => console.error('Erro ao carregar categorias')
+    });
+  }
 
   form = new FormGroup({
     description: new FormControl('', [Validators.required]),

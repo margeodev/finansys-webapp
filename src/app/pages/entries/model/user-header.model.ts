@@ -1,9 +1,11 @@
 export class UserHeader {
     constructor(
-        public id?: number,
+        public id?: string,
         public userName?: string,
         public subtotal?: number,
         public advance?: number,
-        public balance?: number
+        public balance?: number,
+        public totalShared?: number,
+        public totalPersonal?: number
     ) {}
 }

@@ -1,11 +1,23 @@
 @import "tailwindcss";
 
 body {
-  /* font-family: var(--font-family); */
-  background-color: rgb(240, 240, 240);
+  background-color: #f1f5f9;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(59,130,246,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139,92,246,0.03) 0%, transparent 50%);
+  min-height: 100vh;
 }
 
-::root {
+/* Tab ativa: troca verde → azul */
+.p-tab.p-tab-active {
+  color: #3b82f6 !important;
+}
+
+.p-tablist-active-bar {
+  background: #3b82f6 !important;
+}
+
+:root {
   /* Cores do gráfico de despesas */
   --color-blue: #42A5F5;
   --color-green: #66BB6A;
@@ -24,6 +36,13 @@ body {
   /* Cores de texto e grid */
   --text-color: #495057;
   --grid-color: #ebedef;
+
+  /* Paleta semântica da aplicação */
+  --brand-green: #16a34a;
+  --brand-blue: #3b82f6;
+  --brand-violet: #8b5cf6;
+  --brand-amber: #f59e0b;
+  --brand-red: #ef4444;
 }
 
 .container {

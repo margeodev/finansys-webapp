@@ -11,7 +11,7 @@ import { EntryRequest } from '../model/entryRequest.model';
   providedIn: 'root'
 })
 export class EntryService {
-  private apiUrl: string = `${environment.apiUrl}${environment.localApi}/v1/expenses`;
+  private apiUrl: string = `${environment.apiUrl}/expenses`;
 
   private readonly CATEGORY_LABELS: Record<string, string> = {
     '1': 'Moradia',
@@ -45,11 +45,11 @@ export class EntryService {
 
     return this.http.post<Entry>(this.apiUrl, payload).pipe(
       catchError(this.handleError),
-      map(this.jsonToEntry)
+      map((data) => this.jsonToEntry(data))
     );
   }
 
-  getByUserAndMonth(userId: number, date?: string, isPersonal: boolean = false): Observable<Entry[]> {
+  getByUserAndMonth(userId: string, date?: string, isPersonal: boolean = false): Observable<Entry[]> {
     let params = new HttpParams();
     params = params.set('isActive', 'true');
     params = params.set('userId', String(userId));
@@ -63,7 +63,7 @@ export class EntryService {
     );
   }
 
-  getUserTotal(userId: number, date?: string): Observable<BalanceResponse> {
+  getUserTotal(userId: string, date?: string): Observable<BalanceResponse> {
     let params = new HttpParams();
     params = params.set('isActive', 'true');
     params = params.set('userId', String(userId));
@@ -110,7 +110,7 @@ export class EntryService {
     const payload = { isAdvancePayment: entry.advancePayment };
     return this.http.patch<Entry>(url, payload).pipe(
       catchError(this.handleError),
-      map(this.jsonToEntry)
+      map((data) => this.jsonToEntry(data))
     );
   }
 

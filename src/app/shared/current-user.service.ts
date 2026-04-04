@@ -1,14 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Auth, authState } from '@angular/fire/auth';
-import {
-  Firestore,
-  collection,
-  getDocs,
-  query,
-  where,
-  limit,
-} from '@angular/fire/firestore';
-import { from, map, of, switchMap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { from, of, switchMap, map, catchError, Observable } from 'rxjs';
+import { SupabaseService } from './supabase.service';
+import { environment } from '../../environments/environment';
 
 export interface CurrentUserInfo {
   email: string | null;
@@ -16,52 +10,30 @@ export interface CurrentUserInfo {
   role: string | null;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class CurrentUserService {
-  constructor(private auth: Auth, private firestore: Firestore) {}
+  constructor(private supabase: SupabaseService, private http: HttpClient) {}
 
-  getCurrentUserInfo() {
-    return authState(this.auth).pipe(
-      switchMap((firebaseUser) => {
-        if (!firebaseUser?.email) {
-          return of<CurrentUserInfo>({
-            email: null,
-            username: null,
-            role: null,
-          });
+  getCurrentUserInfo(): Observable<CurrentUserInfo> {
+    return from(this.supabase.client.auth.getSession()).pipe(
+      switchMap(({ data }) => {
+        const session = data.session;
+        if (!session?.user?.email) {
+          return of<CurrentUserInfo>({ email: null, username: null, role: null });
         }
 
-        const usersCol = collection(this.firestore, 'users');
-        const q = query(
-          usersCol,
-          where('email', '==', firebaseUser.email),
-          limit(1)
-        );
-
-        return from(getDocs(q)).pipe(
-          map((snapshot) => {
-            if (snapshot.empty) {
-              return {
-                email: firebaseUser.email!,
-                username: firebaseUser.email!,
-                role: null,
-              } as CurrentUserInfo;
-            }
-
-            const doc = snapshot.docs[0];
-            const data = doc.data() as any;
-
-            return {
-              email: firebaseUser.email!,
-              username: data?.username ?? firebaseUser.email!,
-              role: data?.role ?? null,
-            } as CurrentUserInfo;
-          })
-        );
+        const email = session.user.email;
+        return this.http
+          .get<any>(`${environment.apiUrl}/users?email=${encodeURIComponent(email)}`)
+          .pipe(
+            map((user) => ({
+              email,
+              username: user?.username ?? email,
+              role: user?.username?.toLowerCase() === 'admin' ? 'admin' : 'user',
+            } as CurrentUserInfo)),
+            catchError(() => of<CurrentUserInfo>({ email, username: email, role: null }))
+          );
       })
     );
   }
 }
-

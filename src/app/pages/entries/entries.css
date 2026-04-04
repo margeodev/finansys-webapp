@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
+
+:host {
+  font-family: 'Sora', sans-serif;
+}
+
+.entries-page {
+  padding: 28px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  margin: 0 0 20px 0;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.user-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e8edf3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.user-column.user-one {
+  border-top: 3px solid #3b82f6;
+}
+
+.user-column.user-two {
+  border-top: 3px solid #8b5cf6;
+}
+
+.user-column app-entry-header {
+  display: block;
+}
+
+.user-column :host ::ng-deep .p-card {
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.tabs-wrapper {
+  padding: 0;
+}
+
+.tabs-wrapper :host ::ng-deep .p-tabs {
+  border-radius: 0;
+}
+
+.tabs-wrapper :host ::ng-deep .p-tablist {
+  padding: 0 16px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.tabs-wrapper :host ::ng-deep .p-tabpanels {
+  padding: 12px 0 !important;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+  color: #94a3b8;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 900px) {
+  .entries-page {
+    padding: 16px;
+  }
+
+  .users-grid {
+    grid-template-columns: 1fr;
+  }
+}

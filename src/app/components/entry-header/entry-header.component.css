@@ -1,98 +1,172 @@
-.card-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+:host {
+  display: block;
+  width: 100%;
+  font-family: 'Sora', sans-serif;
 }
 
-.user-info {
+:host ::ng-deep .p-card {
+  width: 100%;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+:host ::ng-deep .p-card-body,
+:host ::ng-deep .p-card-content {
+  padding: 0 !important;
+}
+
+.header-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 80px;
+  background: #fff;
+}
+
+/* ── Lado esquerdo ── */
+.header-left {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 20px;
+  min-width: 160px;
+  max-width: 160px;
+  border-right: 1px solid #f1f5f9;
+  background: #fff;
 }
 
-.user-line {
-  display: flex;
-  flex-direction: row;
+.user-name-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.add-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 5px 10px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: #15803d;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background 0.15s;
 }
 
-.user-label {
-  font-weight: bold;
+.add-btn:hover {
+  background: #166534;
 }
 
-.user-name {
-  font-weight: 500;
-  display: block;
+.add-btn-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
-.totals-box {
-  width: 200px;
-}
-
-.totals-row {
+/* ── Métricas ── */
+.metrics-row {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  align-items: stretch;
+  flex: 1;
+  background: #fff;
 }
 
-.value {
-  font-weight: 500;
-}
-
-.positive {
-  color: #16a34a;
-}
-
-.negative {
-  color: #ef4444;
-}
-
-.neutral {
-  color: #000;
-}
-
-.add-button-wrapper {
-  margin-top: 0.5rem;
+.metric-block {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 16px 20px;
+  flex: 1;
+  position: relative;
+  transition: background 0.15s;
+  min-width: 0;
 }
 
-.desktop-only {
-  display: block;
+.metric-block:hover {
+  background: #fafbfc;
 }
+
+.metric-block + .metric-block::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background: #e8edf3;
+}
+
+.metric-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.metric-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #0f172a;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Saldo destacado */
+.saldo-block .metric-label {
+  color: #64748b;
+}
+
+.positive { color: #059669; font-weight: 600; }
+.negative { color: #dc2626; font-weight: 600; }
+.neutral  { color: #0f172a; }
+
+.desktop-only { display: flex; }
 
 @media (max-width: 768px) {
-  .card-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+  .header-layout { flex-direction: column; }
+
+  .header-left {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-width: unset;
+    max-width: unset;
+    padding: 12px 16px;
+    border-right: none;
+    border-bottom: 1px solid #f1f5f9;
   }
 
-  .user-info {
-    align-items: flex-start;
-    text-align: left;
+  .metrics-row { flex-wrap: wrap; }
+
+  .metric-block {
+    flex: 1 1 45%;
+    min-width: 100px;
+    padding: 10px 14px;
   }
 
-  .add-button-wrapper {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .totals-box {
-    width: 100%;
-    text-align: left;
-  }
-
-  .totals-row {
-    justify-content: flex-start;
-  }
-
-  /* Esconde campos Adiantamento e Saldo e o divisor no mobile */
-  .desktop-only {
-    display: none;
-  }
+  .metric-value { font-size: 0.9rem; }
+  .desktop-only { display: none; }
 }

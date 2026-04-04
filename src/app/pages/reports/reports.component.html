@@ -20,7 +20,7 @@
 <div class="kpi-grid mb-4">
 
   <p-card>
-    <div class="kpi-card">
+    <div class="kpi-card kpi-green">
       <div class="kpi-icon"><i class="pi pi-wallet"></i></div>
       <div class="kpi-label">Total do Mês</div>
       <div class="kpi-value">{{ totalSpentThisMonth | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</div>
@@ -28,7 +28,7 @@
   </p-card>
 
   <p-card>
-    <div class="kpi-card">
+    <div class="kpi-card kpi-blue">
       <div class="kpi-icon"><i class="pi pi-tag"></i></div>
       <div class="kpi-label">Maior Categoria</div>
       <div class="kpi-value kpi-text">{{ biggestCategory }}</div>
@@ -36,7 +36,7 @@
   </p-card>
 
   <p-card>
-    <div class="kpi-card">
+    <div class="kpi-card kpi-violet">
       <div class="kpi-icon"><i class="pi pi-list"></i></div>
       <div class="kpi-label">Lançamentos</div>
       <div class="kpi-value">{{ numberOfEntries }}</div>
@@ -44,7 +44,7 @@
   </p-card>
 
   <p-card>
-    <div class="kpi-card">
+    <div class="kpi-card kpi-amber">
       <div class="kpi-icon"><i class="pi pi-chart-line"></i></div>
       <div class="kpi-label">vs. Mês Anterior</div>
       @if (deltaPercent !== null) {
@@ -63,7 +63,7 @@
 <div class="split-grid mb-4">
 
   <p-card>
-    <div class="split-card">
+    <div class="split-card split-blue">
       <div class="split-header">
         <i class="pi pi-users"></i>
         <span>Despesas Compartilhadas</span>
@@ -73,7 +73,7 @@
   </p-card>
 
   <p-card>
-    <div class="split-card">
+    <div class="split-card split-violet">
       <div class="split-header">
         <i class="pi pi-user"></i>
         <span>Despesas Pessoais</span>

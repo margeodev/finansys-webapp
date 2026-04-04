@@ -4,8 +4,6 @@ import { takeUntil } from 'rxjs/operators';
 import { DividerModule } from 'primeng/divider';
 import { EntryService } from './service/entry.service';
 import { CommonModule } from '@angular/common';
-import { CustomBreadcrumb } from '../../shared/breadcrumb/custom-breadcrumb';
-import { PageHeader } from '../../shared/page-header/page-header';
 import { UserService } from './service/user.service';
 import { User } from '../login/model/user.model';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -25,10 +23,8 @@ import { CurrentUserService } from '../../shared/current-user.service';
   selector: 'app-entries',
   imports: [
     CommonModule,
-    CustomBreadcrumb,
     ProgressSpinnerModule,
     FormsModule,
-    PageHeader,
     DividerModule,
     EntryHeaderComponent,
     EntryTableComponent,
@@ -162,35 +158,36 @@ export class Entries implements OnInit, OnDestroy {
             return;
           }
 
-          this.entryService.getByUserAndMonth(current.id, dateParam)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-              next: (entries) => {
-                const balance = this.entryService.computeBalance(entries);
-                const subTotal = balance.subTotalBalance ?? 0;
-                const advance = (balance.totalAdvanceBalance ?? 0) / 2;
-                const header = new UserHeader(current.id, current.username!, subTotal, advance, subTotal);
-
-                if (idx === 0) {
-                  this.userOneEntries = entries;
-                  this.userTwoEntries = [];
-                  this.userOneHeader = header;
-                  this.userTwoHeader = null;
-                } else {
-                  this.userTwoEntries = entries;
-                  this.userOneEntries = [];
-                  this.userTwoHeader = header;
-                  this.userOneHeader = null;
-                }
-
-                this.totalExpenses = header.subtotal ?? 0;
-                this.isLoading = false;
-              },
-              error: (err) => {
-                console.error('Erro ao buscar lançamentos:', err);
-                this.isLoading = false;
+          // Busca ambos os usuários para calcular o saldo corretamente
+          forkJoin([
+            this.entryService.getByUserAndMonth(users[0].id!, dateParam),
+            this.entryService.getByUserAndMonth(users[1].id!, dateParam),
+          ]).pipe(takeUntil(this.destroy$)).subscribe({
+            next: ([entries1, entries2]) => {
+              if (idx === 0) {
+                this.userOneEntries = entries1;
+                this.userTwoEntries = [];
+              } else {
+                this.userTwoEntries = entries2;
+                this.userOneEntries = [];
               }
-            });
+
+              this.buildAdminHeaders(users, entries1, entries2);
+
+              if (idx === 0) {
+                this.userTwoHeader = null;
+              } else {
+                this.userOneHeader = null;
+              }
+
+              this.totalExpenses = (idx === 0 ? this.userOneHeader?.subtotal : this.userTwoHeader?.subtotal) ?? 0;
+              this.isLoading = false;
+            },
+            error: (err) => {
+              console.error('Erro ao buscar lançamentos:', err);
+              this.isLoading = false;
+            }
+          });
         },
         error: (err) => {
           console.error('Erro ao buscar usuários:', err);
@@ -200,13 +197,23 @@ export class Entries implements OnInit, OnDestroy {
   }
 
   private buildAdminHeaders(users: User[], entries1: Entry[], entries2: Entry[]): void {
-    const balance1 = this.entryService.computeBalance(entries1);
-    const balance2 = this.entryService.computeBalance(entries2);
+    const personal1 = entries1.filter(e => e.isPersonal).reduce((s, e) => s + Number(e.amount || 0), 0);
+    const personal2 = entries2.filter(e => e.isPersonal).reduce((s, e) => s + Number(e.amount || 0), 0);
+
+    const sharedEntries1 = entries1.filter(e => !e.isPersonal);
+    const sharedEntries2 = entries2.filter(e => !e.isPersonal);
+
+    const balance1 = this.entryService.computeBalance(sharedEntries1);
+    const balance2 = this.entryService.computeBalance(sharedEntries2);
+
+    // Soma bruta de compartilhadas (para exibição no card)
+    const shared1 = sharedEntries1.reduce((s, e) => s + Number(e.amount || 0), 0);
+    const shared2 = sharedEntries2.reduce((s, e) => s + Number(e.amount || 0), 0);
 
     let subTotalOne = balance1.subTotalBalance ?? 0;
     let subTotalTwo = balance2.subTotalBalance ?? 0;
-    let advance1 = (balance1.totalAdvanceBalance ?? 0) / 2;
-    let advance2 = (balance2.totalAdvanceBalance ?? 0) / 2;
+    const advance1 = (balance1.totalAdvanceBalance ?? 0) / 2;
+    const advance2 = (balance2.totalAdvanceBalance ?? 0) / 2;
 
     this.totalExpenses = (subTotalOne + subTotalTwo) + advance1 + advance2;
 
@@ -217,8 +224,8 @@ export class Entries implements OnInit, OnDestroy {
     const total2 = subTotalTwo + advance2 + advance1;
     const saldo1 = this.calculateSaldo(subTotalOne, subTotalTwo);
 
-    this.userOneHeader = new UserHeader(users[0].id!, users[0].username!, total1, advance1, saldo1);
-    this.userTwoHeader = new UserHeader(users[1].id!, users[1].username!, total2, advance2, -saldo1);
+    this.userOneHeader = new UserHeader(users[0].id!, users[0].username!, total1, advance1, saldo1, shared1, personal1);
+    this.userTwoHeader = new UserHeader(users[1].id!, users[1].username!, total2, advance2, -saldo1, shared2, personal2);
   }
 
   private calculateSaldo(subTotalOne: number, subTotalTwo: number): number {

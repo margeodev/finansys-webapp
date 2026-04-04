@@ -4,15 +4,17 @@
   </ng-template>
 
   <ng-template pTemplate="end">
-    <span class="mr-3" *ngIf="currentUser$ | async as user">
-      <i class="pi pi-user mr-1"></i>
-      {{ user.username || user.email }}
-    </span>
+    @if (currentUser$ | async; as user) {
+      <div class="nav-user">
+        <div class="nav-user-avatar">{{ (user.username || user.email || '?').charAt(0).toUpperCase() }}</div>
+        {{ user.username || user.email }}
+      </div>
+    }
     <p-button
       label="Sair"
       icon="pi pi-sign-out"
       (onClick)="logout()"
-      severity="secondary"
+      styleClass="logout-btn"
     />
   </ng-template>
 </p-menubar>

@@ -68,7 +68,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
   personalTotal: number = 0;
 
   isAdmin: boolean = false;
-  private currentUserId: number = 1;
+  private currentUserId: string = '';
+  private user2Id: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -87,7 +88,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
         this.userService.getAll().pipe(takeUntil(this.destroy$)).subscribe(users => {
           const match = users.find(u => u.username?.toLowerCase() === (info.username ?? '').toLowerCase());
-          this.currentUserId = match?.id ?? 1;
+          this.currentUserId = match?.id ?? users[0]?.id ?? '';
+          this.user2Id = users[1]?.id ?? '';
 
           this.selectedMonthService.selectedMonth$
             .pipe(takeUntil(this.destroy$))
@@ -106,9 +108,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
     const dateParam = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
       .toISOString().split('T')[0];
 
-    const userId = this.isAdmin ? 1 : this.currentUserId;
+    const userId = this.currentUserId;
     const user2Entries$ = this.isAdmin
-      ? this.entryService.getByUserAndMonth(2, dateParam)
+      ? this.entryService.getByUserAndMonth(this.user2Id, dateParam)
       : of([] as Entry[]);
 
     forkJoin({
@@ -133,49 +135,70 @@ export class ReportsComponent implements OnInit, OnDestroy {
       return acc;
     }, {} as Record<string, number>);
 
-    const chartData = Object.entries(aggregated).map(([name, value]) => ({ value, name }));
-    const colors = chartData.map((_, i) => this.colorList[i % this.colorList.length]);
+    const chartData = Object.entries(aggregated)
+      .filter(([, value]) => value > 0)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, value], i) => ({
+        value,
+        name,
+        itemStyle: { color: this.colorList[i % this.colorList.length], borderRadius: [4, 4, 0, 0] }
+      }));
 
     this.chartOptions = {
       title: {
         text: 'Despesas por Categoria',
-        top: 0, left: 'center',
-        textStyle: { fontSize: 22, fontWeight: 'bold', color: '#334155' }
+        left: 'center',
+        textStyle: { fontSize: 18, fontWeight: 'bold', color: '#334155' }
       },
-      tooltip: { trigger: 'item' },
-      legend: {
-        orient: 'vertical', top: 60, left: 'left', type: 'scroll',
-        itemWidth: 14, itemHeight: 14, icon: 'circle',
-        textStyle: { color: '#333', fontSize: 14 },
-        formatter: (name: any) => ` ${name}`,
-        backgroundColor: '#f9f9f9', borderColor: '#ccc', borderWidth: 1, padding: [20, 20]
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any[]) => {
+          const p = params[0];
+          return `${p.name}<br/>R$ ${Number(p.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        }
       },
-      color: colors,
+      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: chartData.map(d => d.name),
+        axisLabel: { color: '#495057', fontSize: 12, interval: 0, rotate: chartData.length > 5 ? 20 : 0 }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: {
+          formatter: (v: number) => `R$ ${v.toLocaleString('pt-BR')}`,
+          color: '#495057'
+        }
+      },
       series: [{
-        name: 'Despesas', top: 40, type: 'pie',
-        radius: ['20%', '80%'], center: ['55%', '50%'],
+        type: 'bar',
         data: chartData,
-        label: { show: true, formatter: '{b}: R$ {c}', fontSize: 14, color: '#333' },
-        emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.5)' } }
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (p: any) => `R$ ${Number(p.value).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`,
+          fontSize: 11,
+          color: '#334155'
+        },
+        emphasis: { itemStyle: { opacity: 0.8 } }
       }]
     };
   }
 
   private buildKpis(current: ReportModel[], prev: ReportModel[], allEntries: Entry[]): void {
-    const currentTotal = current.reduce((s, r) => s + (Number(r.total) || 0), 0);
     const prevTotal = prev.reduce((s, r) => s + (Number(r.total) || 0), 0);
 
-    this.totalSpentThisMonth = currentTotal;
+    this.sharedTotal = allEntries.filter(e => !e.isPersonal).reduce((s, e) => s + (Number(e.amount) || 0), 0);
+    this.personalTotal = allEntries.filter(e => e.isPersonal).reduce((s, e) => s + (Number(e.amount) || 0), 0);
+    this.totalSpentThisMonth = this.sharedTotal + this.personalTotal;
     this.numberOfEntries = allEntries.length;
 
     const sorted = [...current].sort((a, b) => (Number(b.total) || 0) - (Number(a.total) || 0));
     this.biggestCategory = sorted[0]?.categoryDescription ?? '—';
 
-    this.sharedTotal = allEntries.filter(e => !e.isPersonal).reduce((s, e) => s + (Number(e.amount) || 0), 0);
-    this.personalTotal = allEntries.filter(e => e.isPersonal).reduce((s, e) => s + (Number(e.amount) || 0), 0);
-
     if (prevTotal > 0) {
-      this.deltaPercent = ((currentTotal - prevTotal) / prevTotal) * 100;
+      this.deltaPercent = ((this.totalSpentThisMonth - prevTotal) / prevTotal) * 100;
       this.deltaPositive = this.deltaPercent <= 0;
     } else {
       this.deltaPercent = null;

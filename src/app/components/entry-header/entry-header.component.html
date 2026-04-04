@@ -1,53 +1,35 @@
 <p-card>
-  <div class="card-content">
-    <div class="user-info">
-      <span class="user-line">
-        <span class="user-label">Usuário:</span>
-        <span class="user-name">{{ userName }}</span>
-      </span>
+  <div class="header-layout">
 
-      <div class="totals-box">
-        <span class="totals-row">
-          <span class="totals-label">Total:</span>
-          <span class="value">
-            {{ subTotal | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
-          </span>
-        </span>
+    <div class="header-left">
+      <span class="user-name-label">{{ userName }}</span>
+      <button class="add-btn" (click)="showCreateDialog()">
+        <span class="add-btn-icon">+</span>
+        <span>Adicionar</span>
+      </button>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric-block">
+        <span class="metric-label">Total</span>
+        <span class="metric-value">{{ subTotal | brl }}</span>
       </div>
 
-      <div class="add-button-wrapper">
-        <p-button
-          icon="pi pi-plus"
-          (click)="showCreateDialog()"
-          label="Adicionar"
-        />
+      <div class="metric-block">
+        <span class="metric-label">Individual</span>
+        <span class="metric-value">{{ totalPersonal | brl }}</span>
+      </div>
+
+      <div class="metric-block saldo-block">
+        <span class="metric-label">Saldo</span>
+        <span class="metric-value" [ngClass]="{
+          positive: (saldo ?? 0) > 0,
+          negative: (saldo ?? 0) < 0,
+          neutral: saldo === 0
+        }">{{ saldo | brl }}</span>
       </div>
     </div>
 
-    <p-divider layout="vertical" class="desktop-only" />
-
-    <div class="totals-box desktop-only">
-      <span class="totals-row">
-        Adiantamento:
-        <span class="value">
-          {{ advance | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
-        </span>
-      </span>
-
-      <span class="totals-row">
-        Saldo:
-        <span
-          *ngIf="saldo !== null"
-          [ngClass]="{
-            positive: saldo > 0,
-            negative: saldo < 0,
-            neutral: saldo === 0
-          }"
-        >
-          {{ saldo | currency: 'BRL': 'symbol':'1.2-2':'pt-BR' }}
-        </span>
-      </span>
-    </div>
   </div>
 </p-card>
 

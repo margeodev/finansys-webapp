@@ -4,13 +4,13 @@ import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
 import { AuthService } from '../../pages/login/service/auth.service';
 import { Button } from 'primeng/button';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { CurrentUserService, CurrentUserInfo } from '../current-user.service';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MenubarModule, Button, AsyncPipe, NgIf],
+  imports: [MenubarModule, Button, AsyncPipe],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
@@ -39,7 +39,7 @@ export class Navbar {
           },
           {
               label: 'Categorias',
-              icon: 'pi pi-fw pi-user',
+              icon: 'pi pi-fw pi-tag',
               routerLink:"/categories"
           }
       ];

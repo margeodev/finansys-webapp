@@ -1,119 +1,106 @@
-<div class="mt-4 mb-4">
-  <app-breadcrumb
-    [items]="[{ icon: 'pi pi-home', routerLink: '/reports'}, {label: 'Lançamentos'}]">
-  </app-breadcrumb>
-</div>
+<div class="entries-page">
 
-<app-page-header page-title="Lançamentos">
-</app-page-header>
+  <h1 class="page-title">Lançamentos</h1>
 
-<div class="flex gap-2 align-items-center">
-  <p-datePicker
-    view="month"
-    displayFormat="MM/yyyy"
-    inputFormat="MM/yyyy"
-    [(ngModel)]="mesAnoSelecionado"
-    [showIcon]="true"
-    [minDate]="minDate"
-    [maxDate]="maxDate"
-    placeholder="Selecione mês e ano">
-  </p-datePicker>
+  <div class="filter-bar">
+    <p-datePicker
+      view="month"
+      displayFormat="MM/yyyy"
+      inputFormat="MM/yyyy"
+      [(ngModel)]="mesAnoSelecionado"
+      [showIcon]="true"
+      [minDate]="minDate"
+      [maxDate]="maxDate"
+      placeholder="Selecione mês e ano">
+    </p-datePicker>
 
-  <p-button
-    label="Pesquisar"
-    icon="pi pi-search"
-    [loading]="isLoading"
-    (onClick)="load()"
-    severity="warn"/>
-</div>
-
-<p-divider />
-
-@if (userOneHeader != null || userTwoHeader != null) {
-  <div class="flex justify-between">
-    <!-- Coluna usuário 1 -->
-    @if (isAdmin || currentUserIndex === 0) {
-      <div class="flex flex-col w-full">
-        <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
-        <p-divider />
-        <p-tabs value="0">
-          <p-tablist>
-            <p-tab value="0">Compartilhadas</p-tab>
-            <p-tab value="1">Pessoal</p-tab>
-          </p-tablist>
-
-          <p-tabpanels>
-            <p-tabpanel value="0">
-              <app-entry-table
-                [userName]="userOneHeader!.userName!"
-                [userId]="users[0]?.id ?? null"
-                [dateParam]="dateParam"
-                [allEntries]="userOneEntries">
-              </app-entry-table>
-            </p-tabpanel>
-
-            <p-tabpanel value="1">
-              <app-entry-table
-                [userName]="userOneHeader!.userName!"
-                [userId]="users[0]?.id ?? null"
-                [dateParam]="dateParam"
-                [allEntries]="userOneEntries"
-                [isPersonal]="true">
-              </app-entry-table>
-            </p-tabpanel>
-          </p-tabpanels>
-        </p-tabs>
-      </div>
-    }
-
-    @if ((isAdmin || currentUserIndex === 0) && (isAdmin || currentUserIndex === 1)) {
-      <p-divider layout="vertical" />
-    }
-
-    <!-- Coluna usuário 2 -->
-    @if (isAdmin || currentUserIndex === 1) {
-      <div class="flex flex-col w-full">
-        <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
-        <p-divider />
-
-        <p-tabs value="0">
-          <p-tablist>
-            <p-tab value="0">Compartilhadas</p-tab>
-            <p-tab value="1">Pessoal</p-tab>
-          </p-tablist>
-
-          <p-tabpanels>
-            <p-tabpanel value="0">
-              <app-entry-table
-                [userName]="userTwoHeader!.userName!"
-                [userId]="users[1]?.id ?? null"
-                [dateParam]="dateParam"
-                [allEntries]="userTwoEntries">
-              </app-entry-table>
-            </p-tabpanel>
-
-            <p-tabpanel value="1">
-              <app-entry-table
-                [userName]="userTwoHeader!.userName!"
-                [userId]="users[1]?.id ?? null"
-                [dateParam]="dateParam"
-                [allEntries]="userTwoEntries"
-                [isPersonal]="true">
-              </app-entry-table>
-            </p-tabpanel>
-          </p-tabpanels>
-        </p-tabs>
-      </div>
-    }
+    <p-button
+      label="Pesquisar"
+      icon="pi pi-search"
+      [loading]="isLoading"
+      (onClick)="load()"
+      severity="success"/>
   </div>
-} @else {
-  <div class="flex flex-col items-center justify-center h-64">
-    <p-progressSpinner
-      styleClass="custom-spinner"
-      strokeWidth="4"
-      animationDuration=".5s"
-      [style]="{width: '50px', height: '50px'}">
-    </p-progressSpinner>
-    <p class="mt-4 text-gray-500">Carregando...</p>
-  </div>
-}
+
+  @if (userOneHeader != null || userTwoHeader != null) {
+    <div class="users-grid">
+
+      @if (isAdmin || currentUserIndex === 0) {
+        <div class="user-column user-one">
+          <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
+          <div class="tabs-wrapper">
+            <p-tabs value="0">
+              <p-tablist>
+                <p-tab value="0">Compartilhadas</p-tab>
+                <p-tab value="1">Pessoal</p-tab>
+              </p-tablist>
+              <p-tabpanels>
+                <p-tabpanel value="0">
+                  <app-entry-table
+                    [userName]="userOneHeader!.userName!"
+                    [userId]="users[0]?.id ?? null"
+                    [dateParam]="dateParam"
+                    [allEntries]="userOneEntries">
+                  </app-entry-table>
+                </p-tabpanel>
+                <p-tabpanel value="1">
+                  <app-entry-table
+                    [userName]="userOneHeader!.userName!"
+                    [userId]="users[0]?.id ?? null"
+                    [dateParam]="dateParam"
+                    [allEntries]="userOneEntries"
+                    [isPersonal]="true">
+                  </app-entry-table>
+                </p-tabpanel>
+              </p-tabpanels>
+            </p-tabs>
+          </div>
+        </div>
+      }
+
+      @if (isAdmin || currentUserIndex === 1) {
+        <div class="user-column user-two">
+          <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
+          <div class="tabs-wrapper">
+            <p-tabs value="0">
+              <p-tablist>
+                <p-tab value="0">Compartilhadas</p-tab>
+                <p-tab value="1">Pessoal</p-tab>
+              </p-tablist>
+              <p-tabpanels>
+                <p-tabpanel value="0">
+                  <app-entry-table
+                    [userName]="userTwoHeader!.userName!"
+                    [userId]="users[1]?.id ?? null"
+                    [dateParam]="dateParam"
+                    [allEntries]="userTwoEntries">
+                  </app-entry-table>
+                </p-tabpanel>
+                <p-tabpanel value="1">
+                  <app-entry-table
+                    [userName]="userTwoHeader!.userName!"
+                    [userId]="users[1]?.id ?? null"
+                    [dateParam]="dateParam"
+                    [allEntries]="userTwoEntries"
+                    [isPersonal]="true">
+                  </app-entry-table>
+                </p-tabpanel>
+              </p-tabpanels>
+            </p-tabs>
+          </div>
+        </div>
+      }
+
+    </div>
+  } @else {
+    <div class="loading-state">
+      <p-progressSpinner
+        strokeWidth="4"
+        animationDuration=".5s"
+        [style]="{width: '40px', height: '40px'}">
+      </p-progressSpinner>
+      <span>Carregando...</span>
+    </div>
+  }
+
+</div>

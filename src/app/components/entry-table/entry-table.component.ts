@@ -14,6 +14,7 @@ import { ConfirmDialog, ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
+import { BrlPipe } from '../../shared/pipes/brl.pipe';
 
 @Component({
   selector: 'app-entry-table',
@@ -28,6 +29,7 @@ import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
     ConfirmDialogModule,
     ConfirmDialog,
     TruncatePipe,
+    BrlPipe,
     TooltipModule
   ],
   providers: [ConfirmationService, MessageService],
@@ -36,7 +38,7 @@ import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 })
 export class EntryTableComponent implements OnChanges {
   @Input() userName: string | null = null;
-  @Input() userId: number | null = null;
+  @Input() userId: string | null = null;
   @Input() dateParam: string | null = null;
   @Input() isPersonal: boolean = false;
   @Input() allEntries: Entry[] = [];
@@ -56,7 +58,7 @@ export class EntryTableComponent implements OnChanges {
     if (changes['allEntries'] || changes['isPersonal']) {
       this.entries = this.isPersonal
         ? this.allEntries.filter(e => e.isPersonal)
-        : this.allEntries;
+        : this.allEntries.filter(e => !e.isPersonal);
     }
   }
 
@@ -107,42 +109,41 @@ export class EntryTableComponent implements OnChanges {
     this.messageService.add({ severity: severity, summary: summary, detail: message });
   }
 
-  getCategoryIcon(categoryId: string): any {
+  getCategoryIcon(description: string): string {
     const iconsMap: { [key: string]: string } = {
-      '1': 'house',
-      '2': 'cart-shopping',
-      '3': 'lightbulb-dollar',
-      '4': 'gas-pump',
-      '5': 'joystick',
-      '6': 'stethoscope',
-      '7': 'fork-knife',
-      '8': 'screwdriver-wrench',
-      '9': 'croissant',
-      '10': 'prescription-bottle-medical',
-      '11': 'list',
-      '12': 'cat',
-      '13': 'car-wrench'
+      'moradia':        'house',
+      'supermercado':   'cart-shopping',
+      'conta serviços': 'lightbulb-dollar',
+      'transporte':     'gas-pump',
+      'lazer':          'joystick',
+      'saúde':          'stethoscope',
+      'bares e rest.':  'fork-knife',
+      'manut. casa':    'screwdriver-wrench',
+      'padaria':        'croissant',
+      'farmácia':       'prescription-bottle-medical',
+      'outros':         'list',
+      'pets':           'cat',
+      'manut. carro':   'car-wrench',
     };
-    return iconsMap[categoryId] || 'list';
+    return iconsMap[(description ?? '').toLowerCase()] || 'list';
   }
 
-  getCategoryColor(categoryId: number): string {
-    const colorMap: { [key: number]: string } = {
-      1: '#1565C0',
-      2: '#2E7D32',
-      3: '#E65100',
-      4: '#6A1B9A',
-      5: '#BF360C',
-      6: '#00838F',
-      7: '#283593',
-      8: '#AD1457',
-      9: '#558B2F',
-      10: '#F9A825',
-      11: '#546E7A',
-      12: '#00695C',
-      13: '#827717'
+  getCategoryColor(description: string): string {
+    const colorMap: { [key: string]: string } = {
+      'moradia':        '#1565C0',
+      'supermercado':   '#2E7D32',
+      'conta serviços': '#E65100',
+      'transporte':     '#6A1B9A',
+      'lazer':          '#BF360C',
+      'saúde':          '#00838F',
+      'bares e rest.':  '#283593',
+      'manut. casa':    '#AD1457',
+      'padaria':        '#558B2F',
+      'farmácia':       '#F9A825',
+      'outros':         '#546E7A',
+      'pets':           '#00695C',
+      'manut. carro':   '#827717',
     };
-
-    return colorMap[categoryId] || '#1565C0';
+    return colorMap[(description ?? '').toLowerCase()] || '#1565C0';
   }
 }
