@@ -1,6 +1,6 @@
 export class UserHeader {
     constructor(
-        public id?: string,
+        public id?: number,
         public userName?: string,
         public subtotal?: number,
         public advance?: number,

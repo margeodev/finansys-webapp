@@ -10,8 +10,11 @@
     </div>
 
     <div class="metrics-row">
-      <div class="metric-block">
-        <span class="metric-label">Total</span>
+      <div class="metric-block total-block"
+           [pTooltip]="totalTooltip"
+           tooltipPosition="bottom"
+           [escape]="false">
+        <span class="metric-label">Total <i class="pi pi-info-circle total-info-icon"></i></span>
         <span class="metric-value">{{ subTotal | brl }}</span>
       </div>
 

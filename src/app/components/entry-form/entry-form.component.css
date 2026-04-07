@@ -35,17 +35,79 @@
   padding: 0.6rem 0.75rem; /* aumenta o padding interno */
 }
 
-/* Linha do checkbox continua em linha única */
-.entry-form .flex.items-center.pessoal-row {
+/* Linha dos checkboxes lado a lado */
+.checkbox-row {
+  display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 1.5rem;
 }
 
-/* No row do checkbox, o label não ocupa a largura toda para permitir ficar lado a lado */
-.entry-form .pessoal-row .entry-label {
+.checkbox-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-item .entry-label {
   width: auto;
-  margin-right: 0.5rem;
   margin-bottom: 0 !important;
+}
+
+/* Painel de recorrência */
+.recurrence-panel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recurrence-row {
+  display: flex;
+  align-items: center;
+  flex-direction: row !important;
+  gap: 12px;
+}
+
+.recurrence-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  width: 72px;
+  min-width: 72px;
+  margin-bottom: 0 !important;
+}
+
+.recurrence-input-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.recurrence-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+:host ::ng-deep .recurrence-select-btn .p-selectbutton {
+  gap: 4px;
+  width: 100%;
+}
+
+:host ::ng-deep .recurrence-select-btn .p-selectbutton .p-togglebutton {
+  flex: 1;
+  justify-content: center;
+}
+
+:host ::ng-deep .recurrence-select-btn .p-togglebutton {
+  font-size: 0.8rem;
+  padding: 6px 14px;
 }
 
 @media (max-width: 768px) {

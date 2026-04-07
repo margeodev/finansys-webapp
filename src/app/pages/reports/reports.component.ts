@@ -68,8 +68,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
   personalTotal: number = 0;
 
   isAdmin: boolean = false;
-  private currentUserId: string = '';
-  private user2Id: string = '';
+  private currentUserId: number | null = null;
+  private user2Id: number | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -88,8 +88,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
         this.userService.getAll().pipe(takeUntil(this.destroy$)).subscribe(users => {
           const match = users.find(u => u.username?.toLowerCase() === (info.username ?? '').toLowerCase());
-          this.currentUserId = match?.id ?? users[0]?.id ?? '';
-          this.user2Id = users[1]?.id ?? '';
+          this.currentUserId = match?.id ?? users[0]?.id ?? null;
+          this.user2Id = users[1]?.id ?? null;
 
           this.selectedMonthService.selectedMonth$
             .pipe(takeUntil(this.destroy$))
@@ -109,13 +109,15 @@ export class ReportsComponent implements OnInit, OnDestroy {
       .toISOString().split('T')[0];
 
     const userId = this.currentUserId;
-    const user2Entries$ = this.isAdmin
+    const user2Entries$ = this.isAdmin && this.user2Id != null
       ? this.entryService.getByUserAndMonth(this.user2Id, dateParam)
       : of([] as Entry[]);
 
     forkJoin({
       sixMonths: this.reportService.getLastNMonths(6, monthsBack),
-      user1Entries: this.entryService.getByUserAndMonth(userId, dateParam),
+      user1Entries: userId != null
+        ? this.entryService.getByUserAndMonth(userId, dateParam)
+        : of([] as Entry[]),
       user2Entries: user2Entries$,
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: ({ sixMonths, user1Entries, user2Entries }) => {

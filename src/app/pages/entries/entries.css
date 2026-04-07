@@ -33,6 +33,10 @@
   align-items: start;
 }
 
+.users-grid:has(.user-column:only-child) {
+  grid-template-columns: minmax(0, 800px);
+}
+
 .user-column {
   display: flex;
   flex-direction: column;

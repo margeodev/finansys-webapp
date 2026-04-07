@@ -37,7 +37,7 @@ import { BrlPipe } from '../../shared/pipes/brl.pipe';
 })
 export class EntryTableComponent implements OnChanges {
   @Input() userName: string | null = null;
-  @Input() userId: string | null = null;
+  @Input() userId: number | null = null;
   @Input() dateParam: string | null = null;
   @Input() isPersonal: boolean = false;
   @Input() allEntries: Entry[] = [];

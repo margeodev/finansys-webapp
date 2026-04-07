@@ -27,7 +27,7 @@
 
       @if (isAdmin || currentUserIndex === 0) {
         <div class="user-column user-one">
-          <app-entry-header [userHeader]="userOneHeader"></app-entry-header>
+          <app-entry-header [userHeader]="userOneHeader" [entries]="userOneEntries"></app-entry-header>
           <div class="tabs-wrapper">
             <p-tabs value="0">
               <p-tablist>
@@ -60,7 +60,7 @@
 
       @if (isAdmin || currentUserIndex === 1) {
         <div class="user-column user-two">
-          <app-entry-header [userHeader]="userTwoHeader"></app-entry-header>
+          <app-entry-header [userHeader]="userTwoHeader" [entries]="userTwoEntries"></app-entry-header>
           <div class="tabs-wrapper">
             <p-tabs value="0">
               <p-tablist>

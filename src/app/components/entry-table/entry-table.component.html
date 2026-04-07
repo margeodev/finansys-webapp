@@ -22,6 +22,18 @@
             <i class="fa-solid" [ngClass]="'fa-' + getCategoryIcon(entry?.category?.description)"></i>
           </span>
           <span>{{ entry.description | truncate: 20 }}</span>
+          @if (entry.recurrenceRule?.type === 'fixed') {
+            <span class="recurrence-badge recurrence-fixed" pTooltip="Conta fixa mensal" tooltipPosition="top">
+              <i class="pi pi-refresh"></i>
+            </span>
+          }
+          @if (entry.recurrenceRule?.type === 'installment') {
+            <span class="recurrence-badge recurrence-installment"
+              [pTooltip]="'Parcela ' + entry.installmentNumber + ' de ' + entry.recurrenceRule?.totalInstallments"
+              tooltipPosition="top">
+              {{ entry.installmentNumber }}/{{ entry.recurrenceRule?.totalInstallments }}
+            </span>
+          }
         </div>
       </td>
 

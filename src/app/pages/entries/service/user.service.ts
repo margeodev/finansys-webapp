@@ -17,7 +17,7 @@ export class UserService {
     return this.http.get<any[]>(`${this.apiUrl}?isActive=true`).pipe(
       map(data => data
         .filter(u => u.username !== 'Admin')
-        .map(u => new User(u.id, u.username))
+        .map(u => new User(Number(u.id), u.username))
         .sort((a, b) => a.username?.toLowerCase() === 'marcio' ? -1 : b.username?.toLowerCase() === 'marcio' ? 1 : 0)
       )
     );

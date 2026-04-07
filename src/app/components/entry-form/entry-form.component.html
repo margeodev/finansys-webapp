@@ -13,10 +13,10 @@
 <div class="flex items-center gap-4 mb-4">
   <label for="amount" class="font-semibold w-24 entry-label">Valor</label>
   <div class="flex flex-col flex-auto">
-    <p-inputNumber 
-        mode="currency" 
-        currency="BRL" 
-        locale="pt-BR" 
+    <p-inputNumber
+        mode="currency"
+        currency="BRL"
+        locale="pt-BR"
         [formControl]="form.controls['amount']"
         inputId="amount"
         autocomplete="off"
@@ -49,14 +49,74 @@
   </div>
 </div>
 
-<div class="flex items-center gap-2 mb-4 pessoal-row">
-  <label for="isPersonal" class="font-semibold w-24 entry-label">Pessoal</label>
-  <p-checkbox
-    inputId="isPersonal"
-    [formControl]="form.controls['isPersonal']"
-    binary="true">
-  </p-checkbox>
+<div class="flex items-center gap-4 mb-4">
+  <label for="date" class="font-semibold w-24 entry-label">Data</label>
+  <div class="flex flex-col flex-auto">
+    <p-datePicker
+      inputId="date"
+      [formControl]="form.controls['date']"
+      dateFormat="dd/mm/yy"
+      [showIcon]="true"
+      appendTo="body"
+      class="flex-auto">
+    </p-datePicker>
+    @if (form.controls['date'].invalid && form.controls['date'].touched) {
+      <div class="text-red-500 text-sm">A data é obrigatória</div>
+    }
+  </div>
 </div>
+
+<div class="checkbox-row mb-4">
+  <div class="checkbox-item">
+    <label for="isPersonal" class="font-semibold entry-label">Pessoal</label>
+    <p-checkbox
+      inputId="isPersonal"
+      [formControl]="form.controls['isPersonal']"
+      binary="true">
+    </p-checkbox>
+  </div>
+  <div class="checkbox-item">
+    <label for="isRecurring" class="font-semibold entry-label">Recorrente</label>
+    <p-checkbox
+      inputId="isRecurring"
+      [formControl]="form.controls['isRecurring']"
+      binary="true">
+    </p-checkbox>
+  </div>
+</div>
+
+@if (isRecurring) {
+  <div class="recurrence-panel">
+    <div class="recurrence-row">
+      <p-selectButton
+        [options]="recurrenceTypeOptions"
+        [formControl]="form.controls['recurrenceType']"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="recurrence-select-btn">
+      </p-selectButton>
+    </div>
+
+    @if (isInstallment) {
+      <div class="recurrence-row">
+        <label for="totalInstallments" class="recurrence-label">Parcelas</label>
+        <div class="recurrence-input-wrap">
+          <p-inputNumber
+            inputId="totalInstallments"
+            [formControl]="form.controls['totalInstallments']"
+            [min]="2"
+            [max]="48"
+            placeholder="Ex: 6"
+            class="flex-auto">
+          </p-inputNumber>
+          @if (form.controls['totalInstallments'].invalid && form.controls['totalInstallments'].touched) {
+            <div class="recurrence-error">Informe o número de parcelas (mínimo 2)</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
 
 <div class="actions mt-4">
   <p-button label="Cancelar" severity="secondary" (click)="onCancel()" class="btn-cancelar" />
