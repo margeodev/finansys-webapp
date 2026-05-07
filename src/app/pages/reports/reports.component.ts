@@ -143,7 +143,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       .map(([name, value], i) => ({
         value,
         name,
-        itemStyle: { color: this.colorList[i % this.colorList.length], borderRadius: [4, 4, 0, 0] }
+        itemStyle: { color: this.colorList[i % this.colorList.length] }
       }));
 
     this.chartOptions = {
@@ -153,33 +153,18 @@ export class ReportsComponent implements OnInit, OnDestroy {
         textStyle: { fontSize: 18, fontWeight: 'bold', color: '#334155' }
       },
       tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        formatter: (params: any[]) => {
-          const p = params[0];
-          return `${p.name}<br/>R$ ${Number(p.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-        }
-      },
-      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: chartData.map(d => d.name),
-        axisLabel: { color: '#495057', fontSize: 12, interval: 0, rotate: chartData.length > 5 ? 20 : 0 }
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          formatter: (v: number) => `R$ ${v.toLocaleString('pt-BR')}`,
-          color: '#495057'
+        trigger: 'item',
+        formatter: (params: any) => {
+          return `${params.name}<br/>R$ ${Number(params.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
         }
       },
       series: [{
-        type: 'bar',
+        type: 'pie',
         data: chartData,
+        radius: ['0%', '75%'],
         label: {
           show: true,
-          position: 'top',
-          formatter: (p: any) => `R$ ${Number(p.value).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`,
+          formatter: (p: any) => `${p.name}\nR$ ${Number(p.value).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`,
           fontSize: 11,
           color: '#334155'
         },
@@ -231,6 +216,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
           return `${p.name}<br/>R$ ${Number(p.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
         }
       },
+      grid: { left: '3%', right: '4%', bottom: '3%', top: '15%', containLabel: true },
       xAxis: { type: 'category', data: monthLabels, axisLabel: { color: '#495057' } },
       yAxis: {
         type: 'value',
