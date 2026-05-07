@@ -36,19 +36,19 @@ serve(async (req: Request) => {
     const endStr = end.toISOString().split("T")[0];
     const monthStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`;
 
-    const { data: entries, error: entriesError } = await supabase
-      .from("entries")
+    const { data: expenses, error: expensesError } = await supabase
+      .from("expenses")
       .select("*")
-      .gte("created_at", startStr)
-      .lt("created_at", endStr)
-      .eq("isActive", true);
+      .gte("date", startStr)
+      .lt("date", endStr)
+      .eq("is_active", true);
 
-    if (entriesError) throw entriesError;
+    if (expensesError) throw expensesError;
 
     const byCategory: Record<string, number> = {};
-    (entries || []).forEach((entry: any) => {
-      const catId = entry.category_id ? String(entry.category_id) : "_sem_categoria";
-      const amount = Number(entry.amount);
+    (expenses || []).forEach((expense: any) => {
+      const catId = expense.category_id ? String(expense.category_id) : "_sem_categoria";
+      const amount = Number(expense.amount);
       if (!Number.isFinite(amount)) return;
       if (!byCategory[catId]) byCategory[catId] = 0;
       byCategory[catId] += amount;
