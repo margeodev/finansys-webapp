@@ -150,6 +150,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       title: {
         text: 'Despesas por Categoria',
         left: 'center',
+        top: 'top',
         textStyle: { fontSize: 18, fontWeight: 'bold', color: '#334155' }
       },
       tooltip: {
@@ -158,10 +159,16 @@ export class ReportsComponent implements OnInit, OnDestroy {
           return `${params.name}<br/>R$ ${Number(params.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
         }
       },
+      legend: {
+        orient: 'vertical',
+        right: 20,
+        top: 'center'
+      },
       series: [{
         type: 'pie',
         data: chartData,
-        radius: ['0%', '75%'],
+        center: ['40%', '50%'],
+        radius: ['0%', '70%'],
         label: {
           show: true,
           formatter: (p: any) => `${p.name}\nR$ ${Number(p.value).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`,
