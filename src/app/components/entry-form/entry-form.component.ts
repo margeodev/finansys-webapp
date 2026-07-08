@@ -25,6 +25,7 @@ import { environment } from '../../../environments/environment';
 export class EntryFormComponent implements OnInit {
   @Input() userId: number | null | undefined = null;
   categories: { id: number; description: string }[] = [];
+  isSaving: boolean = false;
 
   recurrenceTypeOptions = [
     { label: 'Conta fixa', value: 'fixed' },
@@ -65,6 +66,10 @@ export class EntryFormComponent implements OnInit {
   }
 
   saveEntry(): void {
+    if (this.isSaving) {
+      return;
+    }
+
     if (this.isRecurring && this.isInstallment) {
       const total = this.form.controls['totalInstallments'].value;
       if (!total || total < 2) {
@@ -110,15 +115,18 @@ export class EntryFormComponent implements OnInit {
   }
 
   private createEntry(entryRequest: EntryRequest): void {
+    this.isSaving = true;
     this.service.create(entryRequest).subscribe({
       next: () => {
         this.showMessage(NotificationType.SUCCESS, '', 'Registro incluido com sucesso!');
         this.form.reset({ date: new Date(), isPersonal: false, isRecurring: false, recurrenceType: 'fixed' });
         this.entryEvents.notifyEntryCreated();
         this.entryEvents.setDialogState(false);
+        this.isSaving = false;
       },
       error: () => {
         this.showMessage(NotificationType.ERROR, '', 'Erro ao incluir registro.');
+        this.isSaving = false;
       }
     });
   }

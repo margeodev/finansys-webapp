@@ -119,7 +119,7 @@
 }
 
 <div class="actions mt-4">
-  <p-button label="Cancelar" severity="secondary" (click)="onCancel()" class="btn-cancelar" />
-  <p-button label="Salvar" (click)="saveEntry()" class="btn-salvar" />
+  <p-button label="Cancelar" severity="secondary" (click)="onCancel()" [disabled]="isSaving" class="btn-cancelar" />
+  <p-button label="Salvar" (click)="saveEntry()" [loading]="isSaving" [disabled]="isSaving" class="btn-salvar" />
 </div>
 </div>
