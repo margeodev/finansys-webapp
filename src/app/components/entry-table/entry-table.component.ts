@@ -55,9 +55,20 @@ export class EntryTableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['allEntries'] || changes['isPersonal']) {
-      this.entries = this.isPersonal
+      const filtered = this.isPersonal
         ? this.allEntries.filter(e => e.isPersonal)
         : this.allEntries.filter(e => !e.isPersonal);
+
+      this.entries = filtered.sort((a, b) => {
+        const aRecorrente = a.recurrenceRuleId ? 0 : 1;
+        const bRecorrente = b.recurrenceRuleId ? 0 : 1;
+
+        if (aRecorrente !== bRecorrente) {
+          return aRecorrente - bRecorrente;
+        }
+
+        return new Date(b.date as string).getTime() - new Date(a.date as string).getTime();
+      });
     }
   }
 
