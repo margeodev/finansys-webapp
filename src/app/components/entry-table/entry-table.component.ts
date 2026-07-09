@@ -67,7 +67,7 @@ export class EntryTableComponent implements OnChanges {
           return aRecorrente - bRecorrente;
         }
 
-        return new Date(b.date as string).getTime() - new Date(a.date as string).getTime();
+        return new Date((b as any).date).getTime() - new Date((a as any).date).getTime();
       });
     }
   }
