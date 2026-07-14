@@ -14,6 +14,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 import { BrlPipe } from '../../shared/pipes/brl.pipe';
+import { CategoryFilterComponent } from '../category-filter/category-filter.component';
 
 @Component({
   selector: 'app-entry-table',
@@ -29,7 +30,8 @@ import { BrlPipe } from '../../shared/pipes/brl.pipe';
     ConfirmDialog,
     TruncatePipe,
     BrlPipe,
-    TooltipModule
+    TooltipModule,
+    CategoryFilterComponent
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './entry-table.component.html',
@@ -45,6 +47,8 @@ export class EntryTableComponent implements OnChanges {
   entries: Entry[] = [];
   isEditing: boolean = false;
   visible: boolean = false;
+  selectedCategoryIds: number[] = [];
+  categories: { id: number; description: string }[] = [];
 
   constructor(
     private service: EntryService,
@@ -59,17 +63,54 @@ export class EntryTableComponent implements OnChanges {
         ? this.allEntries.filter(e => e.isPersonal)
         : this.allEntries.filter(e => !e.isPersonal);
 
-      this.entries = filtered.sort((a, b) => {
-        const aRecorrente = a.recurrenceRuleId ? 0 : 1;
-        const bRecorrente = b.recurrenceRuleId ? 0 : 1;
+      this.extractCategories(filtered);
+      this.applyFilters(filtered);
+    }
+  }
 
-        if (aRecorrente !== bRecorrente) {
-          return aRecorrente - bRecorrente;
+  private extractCategories(entries: Entry[]): void {
+    const seen = new Set<number>();
+    this.categories = entries
+      .filter(e => e.category?.id)
+      .reduce((acc, e) => {
+        const categoryId = e.category?.id;
+        const categoryDesc = e.category?.description;
+        if (categoryId && categoryDesc && !seen.has(categoryId)) {
+          seen.add(categoryId);
+          acc.push({ id: categoryId, description: categoryDesc });
         }
+        return acc;
+      }, [] as { id: number; description: string }[]);
+  }
 
-        return new Date((b as any).date).getTime() - new Date((a as any).date).getTime();
+  private applyFilters(filtered: Entry[]): void {
+    let result = filtered;
+
+    if (this.selectedCategoryIds.length > 0) {
+      result = result.filter(e => {
+        const categoryId = e.category?.id;
+        return categoryId && this.selectedCategoryIds.includes(categoryId);
       });
     }
+
+    this.entries = result.sort((a, b) => {
+      const aRecorrente = a.recurrenceRuleId ? 0 : 1;
+      const bRecorrente = b.recurrenceRuleId ? 0 : 1;
+
+      if (aRecorrente !== bRecorrente) {
+        return aRecorrente - bRecorrente;
+      }
+
+      return new Date((b as any).date).getTime() - new Date((a as any).date).getTime();
+    });
+  }
+
+  onCategoryFilterChange(categoryIds: number[]): void {
+    this.selectedCategoryIds = categoryIds;
+    const filtered = this.isPersonal
+      ? this.allEntries.filter(e => e.isPersonal)
+      : this.allEntries.filter(e => !e.isPersonal);
+    this.applyFilters(filtered);
   }
 
   onToggleChange(_event: any, entry: Entry): void {

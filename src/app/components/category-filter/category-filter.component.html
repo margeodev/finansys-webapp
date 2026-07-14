@@ -1,0 +1,20 @@
+<div class="category-filter-container">
+  <p-multiSelect
+    [options]="categories"
+    [(ngModel)]="selectedCategoryIds"
+    optionLabel="description"
+    optionValue="id"
+    placeholder="Filtrar por categoria..."
+    [maxSelectedLabels]="2"
+    [showToggleAll]="true"
+    (onChange)="onSelectionChange()"
+    class="filter-select">
+  </p-multiSelect>
+
+  @if (hasSelection) {
+    <div class="total-display">
+      <span class="total-label">Total:</span>
+      <span class="total-amount">{{ getTotalForCategories() | brl }}</span>
+    </div>
+  }
+</div>

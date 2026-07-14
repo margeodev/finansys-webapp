@@ -1,0 +1,89 @@
+.category-filter-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  max-width: 280px !important;
+}
+
+:host ::ng-deep .filter-select {
+  max-width: 280px;
+}
+
+:host ::ng-deep .p-multiselect-label {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+}
+
+:host ::ng-deep .p-multiselect-trigger {
+  width: 2.5rem;
+}
+
+.total-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface-50);
+  border-radius: 6px;
+  border: 1px solid var(--surface-border);
+  animation: slideIn 0.3s ease-out;
+}
+
+.total-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.total-amount {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  font-family: 'DM Mono', monospace;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode support */
+:host-context(.dark) .total-display {
+  background: var(--surface-800);
+  border-color: var(--surface-700);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .category-filter-container {
+    gap: 12px;
+  }
+
+  .filter-select {
+    max-width: 100% !important;
+  }
+
+  :host ::ng-deep .filter-select {
+    max-width: 100%;
+  }
+
+  .total-display {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

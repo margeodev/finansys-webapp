@@ -1,3 +1,9 @@
+<app-category-filter
+  [categories]="categories"
+  [entries]="allEntries"
+  (selectedCategoriesChange)="onCategoryFilterChange($event)">
+</app-category-filter>
+
 <p-table [value]="entries" showGridlines stripedRows [size]="'small'"
   [paginator]="entries.length > 15" [rows]="15">
 
