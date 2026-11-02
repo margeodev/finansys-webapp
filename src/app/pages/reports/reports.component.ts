@@ -24,6 +24,7 @@ import { FormsModule } from '@angular/forms';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { Card } from 'primeng/card';
 import { CustomBreadcrumb } from '../../shared/breadcrumb/custom-breadcrumb';
+import { CategoryMonthlyComponent } from '../../components/category-monthly/category-monthly.component';
 
 echarts.use([
   PieChart,
@@ -38,7 +39,7 @@ echarts.use([
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [NgxEchartsDirective, PageHeader, Card, CustomBreadcrumb, DatePickerModule, FormsModule, CommonModule],
+  imports: [NgxEchartsDirective, PageHeader, Card, CustomBreadcrumb, DatePickerModule, FormsModule, CommonModule, CategoryMonthlyComponent],
   providers: [provideEchartsCore({ echarts })],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css']

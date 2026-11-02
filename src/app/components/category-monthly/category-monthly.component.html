@@ -1,0 +1,86 @@
+<p-card>
+  <div class="cm">
+    <div class="cm-header">
+      <h2 class="cm-title">Gastos por categoria</h2>
+      <div class="cm-controls">
+        <p-select
+          [options]="categories"
+          [(ngModel)]="categoryId"
+          optionLabel="description"
+          optionValue="id"
+          placeholder="Escolha uma categoria"
+          [showClear]="true"
+          (onChange)="onCategoryChange()"
+          ariaLabel="Categoria"
+          styleClass="cm-select">
+        </p-select>
+        <p-selectButton
+          [options]="orderOptions"
+          [(ngModel)]="order"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          [disabled]="!hasSpending"
+          ariaLabelledBy="cm-order-label">
+        </p-selectButton>
+        <span id="cm-order-label" class="cm-sr-only">Ordenar meses</span>
+      </div>
+    </div>
+
+    @if (categoryId == null) {
+      <p class="cm-empty">Escolha uma categoria para ver o total de cada mês.</p>
+    } @else if (loading) {
+      <div class="cm-list" aria-busy="true">
+        @for (row of skeletonRows; track row) {
+          <div class="cm-row">
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
+            <p-skeleton height="0.75rem"></p-skeleton>
+            <p-skeleton width="5rem" height="1rem"></p-skeleton>
+          </div>
+        }
+      </div>
+    } @else if (error) {
+      <div class="cm-empty">
+        <p>Não foi possível carregar o relatório.</p>
+        <p-button label="Tentar de novo" icon="pi pi-refresh" [outlined]="true" size="small" (onClick)="load()"></p-button>
+      </div>
+    } @else if (report && hasSpending) {
+      <div class="cm-summary">
+        <div class="cm-total">
+          <span class="cm-label">Total até hoje</span>
+          <span class="cm-total-value">{{ report.total | brl }}</span>
+        </div>
+        <div class="cm-fact">
+          <span class="cm-label">Mês de maior gasto</span>
+          <span class="cm-fact-value">{{ report.peak?.total | brl }}</span>
+          <span class="cm-fact-note">{{ report.peak ? monthLabel(report.peak.month) : '—' }}</span>
+        </div>
+        <div class="cm-fact">
+          <span class="cm-label">Média por mês</span>
+          <span class="cm-fact-value">{{ report.average | brl }}</span>
+          <span class="cm-fact-note">{{ report.months.length }} {{ report.months.length === 1 ? 'mês' : 'meses' }}</span>
+        </div>
+      </div>
+
+      <div class="cm-list">
+        @for (m of rows; track m.month) {
+          <div class="cm-row" [class.cm-peak]="isPeak(m)">
+            <span class="cm-month">{{ monthLabel(m.month) }}</span>
+            <span class="cm-track">
+              <span class="cm-bar" [style.width.%]="barWidth(m)"></span>
+              <span class="cm-avg" [style.left.%]="averagePercent"></span>
+            </span>
+            <span class="cm-value">{{ m.total | brl }}</span>
+          </div>
+        }
+      </div>
+
+      <p class="cm-note">
+        Barra azul: mês de maior gasto. Traço vertical: média mensal.
+        O primeiro mês começa no primeiro lançamento da categoria e pode estar incompleto.
+      </p>
+    } @else {
+      <p class="cm-empty">Nenhuma despesa ativa nesta categoria até hoje.</p>
+    }
+  </div>
+</p-card>

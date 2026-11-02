@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, forkJoin, map, of, throwError } from 'rxjs';
-import { ReportModel } from '../model/report.model';
+import { CategoryMonthlyReport, ReportModel } from '../model/report.model';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -26,6 +26,16 @@ export class ReportService {
       this.getByMonth(String(offset + i)).pipe(catchError(() => of([])))
     );
     return forkJoin(calls);
+  }
+
+  getCategoryMonthly(categoryId: number, userId?: number): Observable<CategoryMonthlyReport> {
+    let params = new HttpParams().set('categoryId', String(categoryId));
+    if (userId != null) {
+      params = params.set('userId', String(userId));
+    }
+    return this.http.get<CategoryMonthlyReport>(this.apiUrl, { params }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   private jsonDataToReport(jsonData: any[]): ReportModel[] {

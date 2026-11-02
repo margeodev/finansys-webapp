@@ -6,6 +6,60 @@ const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+
+// GET /reports?categoryId=8[&userId=2]: total por mês de uma categoria até hoje
+async function categoryMonthly(url: URL): Promise<Response> {
+  const id = Number(url.searchParams.get("categoryId"));
+  const userIdParam = url.searchParams.get("userId");
+  const userId = userIdParam ? Number(userIdParam) : null;
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return json({ error: "categoryId deve ser um inteiro positivo" }, 400);
+  }
+  if (userId !== null && (!Number.isInteger(userId) || userId <= 0)) {
+    return json({ error: "userId deve ser um inteiro positivo" }, 400);
+  }
+
+  const { data: months, error } = await supabase.rpc("category_monthly_totals", {
+    p_category_id: id,
+    p_user_id: userId,
+  });
+  if (error) throw error;
+
+  const { data: category, error: categoryError } = await supabase
+    .from("categories")
+    .select("description")
+    .eq("id", id)
+    .maybeSingle();
+  if (categoryError) throw categoryError;
+
+  const rows = (months || []).map((m: any) => ({
+    month: m.month,
+    total: Number(m.total),
+    entries: m.entries,
+  }));
+  const total = Math.round(rows.reduce((s: number, m: any) => s + m.total, 0) * 100) / 100;
+  // rows vem do mês mais recente para o mais antigo: em empate, fica o mais recente
+  const peak = rows.reduce((a: any, b: any) => (b.total > a.total ? b : a), rows[0] ?? null);
+
+  return json({
+    categoryId: id,
+    categoryDescription: category?.description ?? null,
+    total,
+    average: rows.length ? Math.round((total / rows.length) * 100) / 100 : 0,
+    peak,
+    months: rows,
+  });
+}
+
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", {
@@ -19,6 +73,10 @@ serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
+    if (url.searchParams.has("categoryId")) {
+      return await categoryMonthly(url);
+    }
+
     const monthsBack = parseInt(url.searchParams.get("monthsBack") || "0", 10);
 
     if (!Number.isFinite(monthsBack) || monthsBack < 0) {
