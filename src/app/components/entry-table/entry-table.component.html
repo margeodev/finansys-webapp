@@ -101,7 +101,7 @@
 
 @if (isAdmin) {
   <p-dialog header="Editar despesa" [modal]="true" [(visible)]="visible" (onHide)="closeEditDialog()"
-    [style]="{'width': '25rem'}" [breakpoints]="{'768px': '92vw'}">
+    [style]="{'width': '36rem'}" [breakpoints]="{'768px': '92vw'}">
     @if (editingEntry) {
       <app-entry-form [entry]="editingEntry" [userId]="userId" (closed)="closeEditDialog()"></app-entry-form>
     }
