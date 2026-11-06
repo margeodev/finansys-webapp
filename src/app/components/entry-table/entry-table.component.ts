@@ -17,6 +17,7 @@ import { BrlPipe } from '../../shared/pipes/brl.pipe';
 import { CategoryFilterComponent } from '../category-filter/category-filter.component';
 import { Dialog } from 'primeng/dialog';
 import { EntryFormComponent } from '../entry-form/entry-form.component';
+import { getCategoryColor, getCategoryIcon } from '../../shared/category-defaults';
 
 @Component({
   selector: 'app-entry-table',
@@ -263,40 +264,10 @@ export class EntryTableComponent implements OnChanges {
   }
 
   getCategoryIcon(description: string): string {
-    const iconsMap: { [key: string]: string } = {
-      'moradia':        'house',
-      'supermercado':   'cart-shopping',
-      'conta serviços': 'bolt',
-      'transporte':     'gas-pump',
-      'lazer':          'gamepad',
-      'saúde':          'heart-pulse',
-      'bares e rest.':  'utensils',
-      'manut. casa':    'screwdriver-wrench',
-      'padaria':        'mug-hot',
-      'farmácia':       'pills',
-      'outros':         'list',
-      'pets':           'paw',
-      'manut. carro':   'car',
-    };
-    return iconsMap[(description ?? '').toLowerCase()] || 'tag';
+    return getCategoryIcon(description);
   }
 
   getCategoryColor(description: string): string {
-    const colorMap: { [key: string]: string } = {
-      'moradia':        '#1565C0',
-      'supermercado':   '#2E7D32',
-      'conta serviços': '#E65100',
-      'transporte':     '#6A1B9A',
-      'lazer':          '#BF360C',
-      'saúde':          '#00838F',
-      'bares e rest.':  '#283593',
-      'manut. casa':    '#AD1457',
-      'padaria':        '#558B2F',
-      'farmácia':       '#F9A825',
-      'outros':         '#546E7A',
-      'pets':           '#00695C',
-      'manut. carro':   '#827717',
-    };
-    return colorMap[(description ?? '').toLowerCase()] || '#546E7A';
+    return getCategoryColor(description);
   }
 }

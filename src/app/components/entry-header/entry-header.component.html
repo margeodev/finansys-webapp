@@ -3,9 +3,10 @@
 
     <div class="header-left">
       <span class="user-name-label">{{ userName }}</span>
-      <button class="add-btn" (click)="showCreateDialog()">
-        <span class="add-btn-icon">+</span>
-        <span>Adicionar</span>
+      <button type="button" class="add-btn" (click)="showCreateDialog()"
+        [attr.aria-label]="'Adicionar despesa de ' + userName">
+        <span class="add-btn-icon" aria-hidden="true"><i class="pi pi-plus"></i></span>
+        <span class="add-btn-text">Nova despesa</span>
       </button>
     </div>
 

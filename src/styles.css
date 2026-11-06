@@ -70,6 +70,13 @@ body {
   }
 }
 
+/* Telas largas: espaço para as duas colunas de lançamentos sem rolagem horizontal */
+@media (min-width: 1440px) {
+  .container {
+    width: 1520px;
+  }
+}
+
 @media (max-width: 768px) {
   .p-select-overlay {
     min-width: 88vw !important;

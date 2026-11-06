@@ -12,14 +12,14 @@ import { Entry } from '../../pages/entries/model/entry.model';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 import { Checkbox } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { environment } from '../../../environments/environment';
+import { DEFAULT_DESCRIPTIONS, getCategoryColor, getCategoryIcon, sortCategories } from '../../shared/category-defaults';
 
 @Component({
   selector: 'app-entry-form',
-  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule, Checkbox, InputNumberModule, SelectModule, DatePickerModule, SelectButtonModule],
+  imports: [ButtonModule, ReactiveFormsModule, InputTextModule, CommonModule, Checkbox, InputNumberModule, DatePickerModule, SelectButtonModule],
   templateUrl: './entry-form.component.html',
   styleUrl: './entry-form.component.css'
 })
@@ -30,6 +30,8 @@ export class EntryFormComponent implements OnInit, OnChanges {
   @Output() closed = new EventEmitter<void>();
   categories: { id: number; description: string }[] = [];
   isSaving: boolean = false;
+  // Última descrição preenchida automaticamente; o que a pessoa digitou não é sobrescrito
+  private autoDescription: string | null = null;
 
   recurrenceTypeOptions = [
     { label: 'Conta fixa', value: 'fixed' },
@@ -45,7 +47,7 @@ export class EntryFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.http.get<any[]>(`${environment.apiUrl}/categories?isActive=true`).subscribe({
-      next: (data) => this.categories = data.map(c => ({ id: Number(c.id), description: c.description })),
+      next: (data) => this.categories = sortCategories(data.map(c => ({ id: Number(c.id), description: c.description }))),
       error: () => console.error('Erro ao carregar categorias')
     });
   }
@@ -68,6 +70,43 @@ export class EntryFormComponent implements OnInit, OnChanges {
     }
   }
 
+  categoryIcon = getCategoryIcon;
+  categoryColor = getCategoryColor;
+
+  // Cores claras (ex.: amarelo da Farmácia) pedem texto escuro quando o botão está selecionado
+  isLightColor(hex: string): boolean {
+    const n = parseInt(hex.replace('#', ''), 16);
+    const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 160;
+  }
+
+  get selectedCategoryId(): number | null {
+    return this.form.controls['categoryId'].value;
+  }
+
+  selectCategory(categoryId: number): void {
+    const control = this.form.controls['categoryId'];
+    control.setValue(categoryId);
+    control.markAsTouched();
+    this.onCategoryChange(categoryId);
+  }
+
+  onCategoryChange(categoryId: number | null): void {
+    const control = this.form.controls['description'];
+    const current = (control.value ?? '').trim();
+    if (current !== '' && current !== this.autoDescription) return;
+
+    const suggestion = categoryId != null ? DEFAULT_DESCRIPTIONS[categoryId] : undefined;
+    if (suggestion) {
+      control.setValue(suggestion);
+      this.autoDescription = suggestion;
+    } else if (this.autoDescription) {
+      // Troca para uma categoria sem sugestão: limpa o texto automático
+      control.setValue('');
+      this.autoDescription = null;
+    }
+  }
+
   get isEditMode(): boolean {
     return !!this.entry;
   }
@@ -79,6 +118,7 @@ export class EntryFormComponent implements OnInit, OnChanges {
   private fillFromEntry(entry: Entry): void {
     // 'YYYY-MM-DD' montado no fuso local, para não voltar um dia
     const [y, m, d] = String((entry as any).date ?? '').split('-').map(Number);
+    this.autoDescription = null;
     this.form.reset({
       description: entry.description ?? '',
       amount: entry.amount != null ? Number(entry.amount) as any : null,
@@ -194,6 +234,7 @@ export class EntryFormComponent implements OnInit, OnChanges {
     this.service.create(entryRequest).subscribe({
       next: () => {
         this.showMessage(NotificationType.SUCCESS, '', 'Registro incluido com sucesso!');
+        this.autoDescription = null;
         this.form.reset({ date: new Date(), isPersonal: false, isRecurring: false, recurrenceType: 'fixed' });
         this.entryEvents.notifyEntryCreated();
         this.entryEvents.setDialogState(false);
@@ -211,6 +252,7 @@ export class EntryFormComponent implements OnInit, OnChanges {
       this.closed.emit();
       return;
     }
+    this.autoDescription = null;
     this.form.reset({ date: new Date(), isPersonal: false, isRecurring: false, recurrenceType: 'fixed' });
     this.entryEvents.setDialogState(false);
   }

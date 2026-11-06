@@ -128,3 +128,82 @@
   }
 }
 
+/* ── Escolha de categoria em botões, como no app mobile ── */
+.category-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-field-label {
+  font-size: 0.875rem;
+}
+
+.category-loading {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-chip {
+  --chip-color: #546e7a;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 13px 0 11px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+  color: color-mix(in srgb, var(--chip-color) 70%, #000);
+  background: color-mix(in srgb, var(--chip-color) 9%, #fff);
+  border: 1px solid color-mix(in srgb, var(--chip-color) 28%, #fff);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+
+.category-chip i {
+  font-size: 0.8rem;
+}
+
+.category-chip:hover {
+  background: color-mix(in srgb, var(--chip-color) 16%, #fff);
+  border-color: color-mix(in srgb, var(--chip-color) 45%, #fff);
+}
+
+.category-chip:active {
+  transform: translateY(1px);
+}
+
+.category-chip.selected {
+  color: #fff;
+  font-weight: 700;
+  background: var(--chip-color);
+  border-color: var(--chip-color);
+  box-shadow: 0 3px 10px -3px color-mix(in srgb, var(--chip-color) 70%, transparent);
+}
+
+.category-chip.selected.light {
+  color: #3a2a00;
+}
+
+.category-chip:focus-visible {
+  outline: 2px solid var(--chip-color);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-chip {
+    transition: none;
+  }
+}

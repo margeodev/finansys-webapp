@@ -5,8 +5,8 @@
 }
 
 .entries-page {
-  padding: 28px 32px;
-  max-width: 1400px;
+  padding: 28px 0;
+  max-width: 1520px;
   margin: 0 auto;
 }
 
@@ -97,7 +97,7 @@
 
 @media (max-width: 900px) {
   .entries-page {
-    padding: 16px;
+    padding: 16px 0;
   }
 
   .users-grid {

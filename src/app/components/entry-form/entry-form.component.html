@@ -1,4 +1,28 @@
 <div class="entry-form">
+<div class="category-field mb-4">
+  <span id="categoryLabel" class="font-semibold category-field-label">Categoria</span>
+  @if (categories.length === 0) {
+    <div class="category-loading">Carregando categorias...</div>
+  } @else {
+    <div class="category-chips" role="radiogroup" aria-labelledby="categoryLabel">
+      @for (category of categories; track category.id) {
+        <button type="button" class="category-chip" role="radio"
+          [class.selected]="selectedCategoryId === category.id"
+          [class.light]="isLightColor(categoryColor(category.description))"
+          [attr.aria-checked]="selectedCategoryId === category.id"
+          [style.--chip-color]="categoryColor(category.description)"
+          (click)="selectCategory(category.id)">
+          <i class="fa-solid" [ngClass]="'fa-' + categoryIcon(category.description)" aria-hidden="true"></i>
+          <span>{{ category.description }}</span>
+        </button>
+      }
+    </div>
+  }
+  @if (form.controls['categoryId'].invalid && form.controls['categoryId'].touched) {
+    <div class="text-red-500 text-sm">A categoria é obrigatória</div>
+  }
+</div>
+
 <div class="flex items-center gap-4 mb-4">
   <label for="description" class="font-semibold w-24 entry-label">Descrição</label>
   <div class="flex flex-col flex-auto">
@@ -26,26 +50,6 @@
     <div *ngIf="form.controls['amount'].invalid && form.controls['amount'].touched" class="text-red-500 text-sm">
       O valor é obrigatório
     </div>
-  </div>
-</div>
-
-<div class="flex items-center gap-4 mb-4">
-  <label for="categoryId" class="font-semibold w-24 entry-label">Categoria</label>
-  <div class="flex flex-col flex-auto">
-    <p-select
-      inputId="categoryId"
-      [options]="categories"
-      optionLabel="description"
-      optionValue="id"
-      placeholder="Selecione"
-      appendTo="body"
-      [formControl]="form.controls['categoryId']"
-      class="w-full">
-    </p-select>
-
-    @if (form.controls['categoryId'].invalid && form.controls['categoryId'].touched) {
-      <div class="text-red-500 text-sm">A categoria é obrigatória</div>
-    }
   </div>
 </div>
 

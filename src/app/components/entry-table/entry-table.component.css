@@ -20,11 +20,11 @@
   font-weight: 600 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.07em !important;
-  padding: 10px 14px !important;
+  padding: 10px 12px !important;
 }
 
 :host ::ng-deep .p-datatable-tbody > tr > td {
-  padding: 10px 14px !important;
+  padding: 10px 12px !important;
   border-bottom: 1px solid #f1f5f9 !important;
   color: #334155 !important;
   font-size: 0.82rem !important;
@@ -52,7 +52,7 @@
 }
 
 .col-descricao {
-  min-width: 180px;
+  min-width: 170px;
 }
 
 .category-icon-badge {
