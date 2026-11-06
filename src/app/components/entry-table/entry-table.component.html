@@ -13,6 +13,9 @@
       <th class="col-data">Data</th>
       <th class="col-valor">Valor</th>
       <th class="col-acoes">Pago</th>
+      @if (isAdmin) {
+        <th class="col-admin">Ações</th>
+      }
     </tr>
   </ng-template>
 
@@ -52,12 +55,25 @@
                         (onChange)="onToggleChange($event, entry)"
                         [disabled]="isPersonal"/>
       </td>
+
+      @if (isAdmin) {
+        <td class="col-admin">
+          <div class="admin-actions">
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small"
+              pTooltip="Editar" tooltipPosition="top" ariaLabel="Editar despesa"
+              (onClick)="showEditDialog(entry)" />
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
+              pTooltip="Excluir" tooltipPosition="top" ariaLabel="Excluir despesa"
+              (onClick)="confirmDelete(entry)" />
+          </div>
+        </td>
+      }
     </tr>
   </ng-template>
 
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td colspan="4" class="empty-state">
+      <td [attr.colspan]="isAdmin ? 5 : 4" class="empty-state">
         <i class="pi pi-inbox"></i>
         <span>Nenhum lançamento encontrado para este mês</span>
       </td>
@@ -74,3 +90,12 @@
     </div>
   </ng-template>
 </p-confirmdialog>
+
+@if (isAdmin) {
+  <p-dialog header="Editar despesa" [modal]="true" [(visible)]="visible" (onHide)="closeEditDialog()"
+    [style]="{'width': '25rem'}" [breakpoints]="{'768px': '92vw'}">
+    @if (editingEntry) {
+      <app-entry-form [entry]="editingEntry" [userId]="userId" (closed)="closeEditDialog()"></app-entry-form>
+    }
+  </p-dialog>
+}

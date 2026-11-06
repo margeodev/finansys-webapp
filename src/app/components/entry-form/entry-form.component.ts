@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
@@ -7,7 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { NotificationType } from '../../shared/notification-type';
 import { MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
-import { EntryRequest } from '../../pages/entries/model/entryRequest.model';
+import { EntryRequest, EntryUpdateRequest } from '../../pages/entries/model/entryRequest.model';
+import { Entry } from '../../pages/entries/model/entry.model';
 import { EntryEventsService } from '../../pages/entries/service/entry-event.service';
 import { Checkbox } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -22,8 +23,11 @@ import { environment } from '../../../environments/environment';
   templateUrl: './entry-form.component.html',
   styleUrl: './entry-form.component.css'
 })
-export class EntryFormComponent implements OnInit {
+export class EntryFormComponent implements OnInit, OnChanges {
   @Input() userId: number | null | undefined = null;
+  // Quando informado, o formulário edita esta despesa em vez de criar uma nova
+  @Input() entry: Entry | null = null;
+  @Output() closed = new EventEmitter<void>();
   categories: { id: number; description: string }[] = [];
   isSaving: boolean = false;
 
@@ -55,7 +59,42 @@ export class EntryFormComponent implements OnInit {
     isRecurring: new FormControl(false),
     recurrenceType: new FormControl<'fixed' | 'installment'>('fixed'),
     totalInstallments: new FormControl<number | null>(null),
+    applyToNext: new FormControl(false),
   });
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['entry'] && this.entry) {
+      this.fillFromEntry(this.entry);
+    }
+  }
+
+  get isEditMode(): boolean {
+    return !!this.entry;
+  }
+
+  get isRecurringEntry(): boolean {
+    return !!this.entry?.recurrenceRuleId;
+  }
+
+  private fillFromEntry(entry: Entry): void {
+    // 'YYYY-MM-DD' montado no fuso local, para não voltar um dia
+    const [y, m, d] = String((entry as any).date ?? '').split('-').map(Number);
+    this.form.reset({
+      description: entry.description ?? '',
+      amount: entry.amount != null ? Number(entry.amount) as any : null,
+      categoryId: entry.category?.id ?? null,
+      date: y && m && d ? new Date(y, m - 1, d) : new Date(),
+      isPersonal: !!entry.isPersonal,
+      isRecurring: false,
+      recurrenceType: 'fixed',
+      applyToNext: false,
+    });
+  }
+
+  private toDateString(value: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+  }
 
   get isRecurring(): boolean {
     return !!this.form.controls['isRecurring'].value;
@@ -67,6 +106,11 @@ export class EntryFormComponent implements OnInit {
 
   saveEntry(): void {
     if (this.isSaving) {
+      return;
+    }
+
+    if (this.isEditMode) {
+      this.saveEdit();
       return;
     }
 
@@ -109,6 +153,37 @@ export class EntryFormComponent implements OnInit {
     this.createEntry(entry);
   }
 
+  private saveEdit(): void {
+    if (this.form.invalid || !this.entry?.id) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.form.value;
+    const changes: EntryUpdateRequest = {
+      description: formValue.description!.trim(),
+      amount: Number(formValue.amount),
+      categoryId: formValue.categoryId!,
+      date: this.toDateString(formValue.date instanceof Date ? formValue.date : new Date()),
+      isPersonal: !!formValue.isPersonal,
+    };
+    const updateAll = this.isRecurringEntry && !!formValue.applyToNext;
+
+    this.isSaving = true;
+    this.service.edit(this.entry.id, changes, updateAll).subscribe({
+      next: () => {
+        this.showMessage(NotificationType.SUCCESS, '', 'Registro alterado com sucesso!');
+        this.entryEvents.notifyEntryUpdated();
+        this.isSaving = false;
+        this.closed.emit();
+      },
+      error: () => {
+        this.showMessage(NotificationType.ERROR, '', 'Erro ao alterar registro.');
+        this.isSaving = false;
+      }
+    });
+  }
+
   private showMessage(severity: NotificationType, summary: string, message: string) {
     this.messageService.clear();
     this.messageService.add({ severity: severity, summary: summary, detail: message });
@@ -132,6 +207,10 @@ export class EntryFormComponent implements OnInit {
   }
 
   onCancel() {
+    if (this.isEditMode) {
+      this.closed.emit();
+      return;
+    }
     this.form.reset({ date: new Date(), isPersonal: false, isRecurring: false, recurrenceType: 'fixed' });
     this.entryEvents.setDialogState(false);
   }

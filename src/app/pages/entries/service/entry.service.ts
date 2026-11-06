@@ -5,7 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { BalanceResponse } from '../model/balance.model';
 import { Entry } from '../model/entry.model';
-import { EntryRequest } from '../model/entryRequest.model';
+import { EntryRequest, EntryUpdateRequest } from '../model/entryRequest.model';
 
 @Injectable({
   providedIn: 'root'
@@ -90,6 +90,15 @@ export class EntryService {
     const url = updateAll ? `${this.apiUrl}/${id}?updateAll=true` : `${this.apiUrl}/${id}`;
     const payload = { isAdvancePayment: entry.advancePayment };
     return this.http.patch<Entry>(url, payload).pipe(
+      catchError(this.handleError),
+      map((data) => this.jsonToEntry(data))
+    );
+  }
+
+  // Edição completa (admin). updateAll aplica também às próximas parcelas da recorrência.
+  edit(id: string, changes: EntryUpdateRequest, updateAll: boolean = false): Observable<Entry> {
+    const url = updateAll ? `${this.apiUrl}/${id}?updateAll=true` : `${this.apiUrl}/${id}`;
+    return this.http.patch<any>(url, changes).pipe(
       catchError(this.handleError),
       map((data) => this.jsonToEntry(data))
     );

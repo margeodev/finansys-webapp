@@ -15,3 +15,11 @@ export class EntryRequest {
         public recurrence?: RecurrenceRequest | null
     ) {}
 }
+
+export interface EntryUpdateRequest {
+    description: string;
+    amount: number;
+    categoryId: number;
+    date: string; // 'YYYY-MM-DD'
+    isPersonal: boolean;
+}

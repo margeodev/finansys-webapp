@@ -75,17 +75,29 @@
       binary="true">
     </p-checkbox>
   </div>
-  <div class="checkbox-item">
-    <label for="isRecurring" class="font-semibold entry-label">Recorrente</label>
-    <p-checkbox
-      inputId="isRecurring"
-      [formControl]="form.controls['isRecurring']"
-      binary="true">
-    </p-checkbox>
-  </div>
+  @if (!isEditMode) {
+    <div class="checkbox-item">
+      <label for="isRecurring" class="font-semibold entry-label">Recorrente</label>
+      <p-checkbox
+        inputId="isRecurring"
+        [formControl]="form.controls['isRecurring']"
+        binary="true">
+      </p-checkbox>
+    </div>
+  }
+  @if (isEditMode && isRecurringEntry) {
+    <div class="checkbox-item">
+      <label for="applyToNext" class="font-semibold entry-label">Aplicar às próximas parcelas</label>
+      <p-checkbox
+        inputId="applyToNext"
+        [formControl]="form.controls['applyToNext']"
+        binary="true">
+      </p-checkbox>
+    </div>
+  }
 </div>
 
-@if (isRecurring) {
+@if (isRecurring && !isEditMode) {
   <div class="recurrence-panel">
     <div class="recurrence-row">
       <p-selectButton

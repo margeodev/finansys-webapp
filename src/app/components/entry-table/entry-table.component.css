@@ -122,6 +122,18 @@
   border: 1px solid #fde68a;
 }
 
+th.col-admin,
+td.col-admin {
+  width: 5.5rem;
+  text-align: center;
+}
+
+.admin-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.125rem;
+}
+
 @media (max-width: 768px) {
   th.col-data,
   td.col-data {

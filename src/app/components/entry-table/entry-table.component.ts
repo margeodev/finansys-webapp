@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
 import { EntryService } from '../../pages/entries/service/entry.service';
 import { Entry } from '../../pages/entries/model/entry.model';
 import { TableModule } from "primeng/table";
@@ -15,6 +15,8 @@ import { EntryEventsService } from '../../pages/entries/service/entry-event.serv
 import { TruncatePipe } from '../../shared/pipes/truncate.pipe';
 import { BrlPipe } from '../../shared/pipes/brl.pipe';
 import { CategoryFilterComponent } from '../category-filter/category-filter.component';
+import { Dialog } from 'primeng/dialog';
+import { EntryFormComponent } from '../entry-form/entry-form.component';
 
 @Component({
   selector: 'app-entry-table',
@@ -31,7 +33,9 @@ import { CategoryFilterComponent } from '../category-filter/category-filter.comp
     TruncatePipe,
     BrlPipe,
     TooltipModule,
-    CategoryFilterComponent
+    CategoryFilterComponent,
+    Dialog,
+    EntryFormComponent
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './entry-table.component.html',
@@ -43,10 +47,13 @@ export class EntryTableComponent implements OnChanges {
   @Input() dateParam: string | null = null;
   @Input() isPersonal: boolean = false;
   @Input() allEntries: Entry[] = [];
+  // Editar e Excluir só aparecem para o admin
+  @Input() isAdmin: boolean = false;
 
   entries: Entry[] = [];
   isEditing: boolean = false;
   visible: boolean = false;
+  editingEntry: Entry | null = null;
   selectedCategoryIds: number[] = [];
   categories: { id: number; description: string }[] = [];
 
@@ -150,9 +157,69 @@ export class EntryTableComponent implements OnChanges {
     });
   }
 
-  showEditDialog(_entry: Entry) {
+  showEditDialog(entry: Entry) {
+    this.editingEntry = entry;
     this.isEditing = true;
     this.visible = true;
+  }
+
+  closeEditDialog(): void {
+    this.visible = false;
+    this.isEditing = false;
+    this.editingEntry = null;
+  }
+
+  confirmDelete(entry: Entry): void {
+    if (!entry.id) return;
+
+    if (!entry.recurrenceRuleId) {
+      this.confirmationService.confirm({
+        message: `Excluir "${entry.description}"?`,
+        header: 'Excluir despesa',
+        icon: 'pi pi-trash',
+        acceptLabel: 'Excluir',
+        rejectLabel: 'Cancelar',
+        acceptButtonProps: { severity: 'danger' },
+        rejectButtonProps: { severity: 'secondary', outlined: true },
+        accept: () => this.deleteEntry(entry, false),
+      });
+      return;
+    }
+
+    // Recorrente: "Só esta" exclui o lançamento; "Esta e as próximas" desativa a série a partir dele
+    this.confirmationService.confirm({
+      message: `"${entry.description}" é uma despesa recorrente. O que deseja excluir?`,
+      header: 'Excluir despesa recorrente',
+      icon: 'pi pi-trash',
+      acceptLabel: 'Esta e as próximas',
+      rejectLabel: 'Só esta',
+      acceptButtonProps: { severity: 'danger' },
+      rejectButtonProps: { severity: 'danger', outlined: true },
+      closable: true,
+      closeOnEscape: true,
+      accept: () => this.deleteEntry(entry, true),
+      reject: (type: ConfirmEventType) => {
+        if (type === ConfirmEventType.REJECT) {
+          this.deleteEntry(entry, false);
+        }
+      },
+    });
+  }
+
+  private deleteEntry(entry: Entry, cascade: boolean): void {
+    this.service.delete(entry.id!, cascade).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Excluída',
+          detail: cascade ? 'Despesa e próximas parcelas excluídas' : 'Despesa excluída'
+        });
+        this.entryEventService.notifyEntryUpdated();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível excluir a despesa' });
+      }
+    });
   }
 
   getCategoryIcon(description: string): string {

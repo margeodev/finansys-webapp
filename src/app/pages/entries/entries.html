@@ -40,7 +40,8 @@
                     [userName]="userOneHeader!.userName!"
                     [userId]="users[0]?.id ?? null"
                     [dateParam]="dateParam"
-                    [allEntries]="userOneEntries">
+                    [allEntries]="userOneEntries"
+                    [isAdmin]="isAdmin">
                   </app-entry-table>
                 </p-tabpanel>
                 <p-tabpanel value="1">
@@ -49,6 +50,7 @@
                     [userId]="users[0]?.id ?? null"
                     [dateParam]="dateParam"
                     [allEntries]="userOneEntries"
+                    [isAdmin]="isAdmin"
                     [isPersonal]="true">
                   </app-entry-table>
                 </p-tabpanel>
@@ -73,7 +75,8 @@
                     [userName]="userTwoHeader!.userName!"
                     [userId]="users[1]?.id ?? null"
                     [dateParam]="dateParam"
-                    [allEntries]="userTwoEntries">
+                    [allEntries]="userTwoEntries"
+                    [isAdmin]="isAdmin">
                   </app-entry-table>
                 </p-tabpanel>
                 <p-tabpanel value="1">
@@ -82,6 +85,7 @@
                     [userId]="users[1]?.id ?? null"
                     [dateParam]="dateParam"
                     [allEntries]="userTwoEntries"
+                    [isAdmin]="isAdmin"
                     [isPersonal]="true">
                   </app-entry-table>
                 </p-tabpanel>
