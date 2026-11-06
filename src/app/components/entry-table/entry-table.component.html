@@ -2,6 +2,14 @@
   [categories]="categories"
   [entries]="allEntries"
   (selectedCategoriesChange)="onCategoryFilterChange($event)">
+  <button type="button" class="sum-btn" (click)="showRecurringDialog()"
+    [attr.aria-label]="'Somar despesas recorrentes de ' + (userName ?? '')">
+    <span class="sum-btn-glyph" aria-hidden="true">Σ</span>
+    <span class="sum-btn-text">Somar Despesas Recorrentes</span>
+    @if (recurringEntries.length > 0) {
+      <span class="sum-btn-count">{{ recurringEntries.length }}</span>
+    }
+  </button>
 </app-category-filter>
 
 <p-table [value]="entries" showGridlines stripedRows [size]="'small'"
@@ -99,3 +107,60 @@
     }
   </p-dialog>
 }
+
+<p-dialog [modal]="true" [(visible)]="recurringVisible" [dismissableMask]="true" [draggable]="false"
+  [style]="{'width': '30rem'}" [breakpoints]="{'768px': '94vw'}" styleClass="recurring-dialog">
+  <ng-template #header>
+    <div class="rec-title">
+      <span class="rec-title-main">Despesas recorrentes</span>
+      <span class="rec-title-sub">{{ userName }}@if (recurringMonthLabel) { · {{ recurringMonthLabel }} }</span>
+    </div>
+  </ng-template>
+
+  @if (recurringEntries.length === 0) {
+    <p class="rec-empty">Nenhuma despesa recorrente neste mês.</p>
+  } @else {
+    <ul class="rec-list">
+      @for (entry of recurringEntries; track entry.id) {
+        <li class="rec-row">
+          <div class="rec-desc">
+            <span class="rec-name" [title]="entry.description">{{ entry.description }}</span>
+            <span class="rec-meta">
+              {{ recurrenceLabel(entry) }}
+              @if (entry.isPersonal) { <span class="rec-tag">Pessoal</span> }
+            </span>
+          </div>
+          <span class="rec-leader" aria-hidden="true"></span>
+          <span class="rec-amount">{{ entry.amount | brl }}</span>
+        </li>
+      }
+    </ul>
+
+    <div class="rec-summary">
+      @if (hasBothKinds) {
+        <div class="rec-sub">
+          <span>Compartilhadas</span>
+          <span class="rec-amount">{{ recurringShared | brl }}</span>
+        </div>
+        <div class="rec-sub">
+          <span>Pessoais</span>
+          <span class="rec-amount">{{ recurringPersonal | brl }}</span>
+        </div>
+      }
+      <div class="rec-total">
+        <span>Total · {{ recurringEntries.length }} {{ recurringEntries.length === 1 ? 'despesa' : 'despesas' }}</span>
+        <span class="rec-total-value">{{ recurringTotal | brl }}</span>
+      </div>
+
+      <div class="rec-advance">
+        <div class="rec-advance-label">
+          <span class="rec-advance-title">A antecipar</span>
+          <span class="rec-advance-hint">
+            {{ hasPersonalRecurring ? 'Metade das compartilhadas · pessoais não entram' : 'Metade do total' }}
+          </span>
+        </div>
+        <span class="rec-advance-value">{{ recurringAdvance | brl }}</span>
+      </div>
+    </div>
+  }
+</p-dialog>

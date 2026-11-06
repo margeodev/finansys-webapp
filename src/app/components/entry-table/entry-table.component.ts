@@ -54,6 +54,7 @@ export class EntryTableComponent implements OnChanges {
   isEditing: boolean = false;
   visible: boolean = false;
   editingEntry: Entry | null = null;
+  recurringVisible: boolean = false;
   selectedCategoryIds: number[] = [];
   categories: { id: number; description: string }[] = [];
 
@@ -155,6 +156,62 @@ export class EntryTableComponent implements OnChanges {
         console.error('[EntryTable] Erro ao atualizar entrada');
       }
     });
+  }
+
+  // Despesas recorrentes do mês do usuário (compartilhadas e pessoais), da maior para a menor
+  get recurringEntries(): Entry[] {
+    return this.allEntries
+      .filter(e => !!e.recurrenceRuleId)
+      .sort((a, b) => Number(b.amount) - Number(a.amount));
+  }
+
+  get recurringTotal(): number {
+    return this.sumAmounts(this.recurringEntries);
+  }
+
+  get recurringShared(): number {
+    return this.sumAmounts(this.recurringEntries.filter(e => !e.isPersonal));
+  }
+
+  get recurringPersonal(): number {
+    return this.sumAmounts(this.recurringEntries.filter(e => e.isPersonal));
+  }
+
+  // Metade das recorrentes compartilhadas: o que o usuário antecipa. Pessoais não entram em antecipação.
+  get recurringAdvance(): number {
+    return Math.round((this.recurringShared / 2) * 100) / 100;
+  }
+
+  get hasPersonalRecurring(): boolean {
+    return this.recurringEntries.some(e => e.isPersonal);
+  }
+
+  get hasBothKinds(): boolean {
+    const list = this.recurringEntries;
+    return list.some(e => e.isPersonal) && list.some(e => !e.isPersonal);
+  }
+
+  get recurringMonthLabel(): string {
+    const date: string | undefined = (this.allEntries[0] as any)?.date;
+    if (!date) return '';
+    const [y, m] = date.split('-').map(Number);
+    const name = new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long' });
+    return `${name.charAt(0).toUpperCase()}${name.slice(1)} de ${y}`;
+  }
+
+  recurrenceLabel(entry: Entry): string {
+    if (entry.recurrenceRule?.type === 'installment') {
+      return `Parcela ${entry.installmentNumber}/${entry.recurrenceRule.totalInstallments}`;
+    }
+    return 'Conta fixa';
+  }
+
+  showRecurringDialog(): void {
+    this.recurringVisible = true;
+  }
+
+  private sumAmounts(list: Entry[]): number {
+    return Math.round(list.reduce((sum, e) => sum + (Number(e.amount) || 0), 0) * 100) / 100;
   }
 
   showEditDialog(entry: Entry) {
