@@ -54,7 +54,7 @@ export class EntryTableComponent implements OnChanges {
   isEditing: boolean = false;
   visible: boolean = false;
   editingEntry: Entry | null = null;
-  recurringVisible: boolean = false;
+  advanceVisible: boolean = false;
   selectedCategoryIds: number[] = [];
   categories: { id: number; description: string }[] = [];
 
@@ -158,40 +158,23 @@ export class EntryTableComponent implements OnChanges {
     });
   }
 
-  // Despesas recorrentes do mês do usuário (compartilhadas e pessoais), da maior para a menor
-  get recurringEntries(): Entry[] {
+  // Despesas do mês do usuário marcadas como Pago (antecipadas), da maior para a menor
+  get advanceEntries(): Entry[] {
     return this.allEntries
-      .filter(e => !!e.recurrenceRuleId)
+      .filter(e => !!e.advancePayment)
       .sort((a, b) => Number(b.amount) - Number(a.amount));
   }
 
-  get recurringTotal(): number {
-    return this.sumAmounts(this.recurringEntries);
+  get advanceTotal(): number {
+    return this.sumAmounts(this.advanceEntries);
   }
 
-  get recurringShared(): number {
-    return this.sumAmounts(this.recurringEntries.filter(e => !e.isPersonal));
+  // Metade das antecipadas: a mesma regra do saldo (total - adiantamentos / 2)
+  get advanceHalf(): number {
+    return Math.round((this.advanceTotal / 2) * 100) / 100;
   }
 
-  get recurringPersonal(): number {
-    return this.sumAmounts(this.recurringEntries.filter(e => e.isPersonal));
-  }
-
-  // Metade das recorrentes compartilhadas: o que o usuário antecipa. Pessoais não entram em antecipação.
-  get recurringAdvance(): number {
-    return Math.round((this.recurringShared / 2) * 100) / 100;
-  }
-
-  get hasPersonalRecurring(): boolean {
-    return this.recurringEntries.some(e => e.isPersonal);
-  }
-
-  get hasBothKinds(): boolean {
-    const list = this.recurringEntries;
-    return list.some(e => e.isPersonal) && list.some(e => !e.isPersonal);
-  }
-
-  get recurringMonthLabel(): string {
+  get advanceMonthLabel(): string {
     const date: string | undefined = (this.allEntries[0] as any)?.date;
     if (!date) return '';
     const [y, m] = date.split('-').map(Number);
@@ -199,15 +182,15 @@ export class EntryTableComponent implements OnChanges {
     return `${name.charAt(0).toUpperCase()}${name.slice(1)} de ${y}`;
   }
 
-  recurrenceLabel(entry: Entry): string {
+  recurrenceLabel(entry: Entry): string | null {
     if (entry.recurrenceRule?.type === 'installment') {
       return `Parcela ${entry.installmentNumber}/${entry.recurrenceRule.totalInstallments}`;
     }
-    return 'Conta fixa';
+    return entry.recurrenceRule?.type === 'fixed' ? 'Conta fixa' : null;
   }
 
-  showRecurringDialog(): void {
-    this.recurringVisible = true;
+  showAdvanceDialog(): void {
+    this.advanceVisible = true;
   }
 
   private sumAmounts(list: Entry[]): number {
